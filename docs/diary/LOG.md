@@ -380,3 +380,46 @@ step to all servers. That missing step is the completion condition, so NODUS can
 **Open:**
 - Exact condition wording and source sentences: T14 (internal) and T16 (antibodies).
 - Condition *kinds* and the compiler that turns them into queries: T08.
+
+---
+
+## Step 11: T08, condition kinds and the compiler design (04:00)
+
+**What:** designed how a lesson becomes runnable queries, in `docs/condition-kinds.md` (ADR-005):
+- five **condition kinds**: `present`, `absent`, `attribute_equals`, `count_equals`, `time_order`;
+- one shared **spec** vocabulary: `start` (anchor / bound role / "other plans"), `path`
+  (1–2 hops), `target`, optional `bind`;
+- the **anchor-first evaluator** and its status rules (full / foresight / strong / partial);
+- **edge cases decided up front**: no candidate, two candidates, the binding trap,
+  parallel edges, missing data vs real absence.
+Mapped all 9 Lite antibody conditions onto a kind, with no exceptions.
+
+**Why:** if the LLM wrote a query per lesson, I couldn't vouch for any match, and a
+wrong query fails silently. With a fixed set of templates, there are only five query
+shapes to understand and test, and every lesson is just data that plugs into them.
+The rules (understand your code) and the invariant (the LLM never decides matches) both point here.
+
+**First principles: why identifiers can't be parameters.**
+In Cypher, *values* can be `$parameters` (`WHERE p.id = $plan`); the database plans the
+query once and plugs values in safely. *Identifiers* (labels like `Plan`, relationship
+types like `FOLLOWS`, property names) shape the plan itself, so they must be in the query
+text. Pasting text from a lesson into a query is how injection happens. So the compiler
+only allows identifiers from the graph model's whitelist, and everything else is rejected.
+
+**First principles: why the compiler is "deterministic".**
+Same lesson + same graph → same queries → same answer, every time. No randomness, no
+model in the loop. That makes it testable: a pytest can assert exact k values.
+
+**Decisions that differ from the plan (and why):**
+- "scope = all" isn't a separate kind; it's `present` with a filter. One less template.
+- Added `count_equals`: "the *only* gate" is a count, and `present` can't express "exactly one".
+- `time_order` is designed but not built until a lesson needs it.
+
+**Check made:** FalkorDB 6.0.2 rejects maps as property values ("Property values can only
+be of primitive types or arrays of primitive types"), but arrays work. So a condition's
+`spec` is stored as a JSON string.
+
+**Q&A:** none.
+
+**Open:**
+- Does the internal lesson (T14) need `time_order`? If not, it stays unbuilt.

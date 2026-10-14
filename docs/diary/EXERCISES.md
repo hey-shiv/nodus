@@ -130,3 +130,27 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Yes: it counts only `active:true` watchers. A channel "watched" only by someone who left is effectively unwatched. That's the GitLab/Knight shape.</details>
 
 **Self-check:**
+
+---
+
+## Step 11: Condition kinds and the compiler
+
+**E29.** "How does a lesson become queries without the AI writing any query?" Answer in 3 sentences.
+<details><summary>Key</summary>Each approved condition is data: a kind plus a spec (start, path, target, bind). The compiler picks the hand-written template for that kind, checks every label/relationship/property against a whitelist, and passes all values as parameters. The same lesson always produces the same queries.</details>
+
+**E30.** Which kind fits each? (a) "the plan has no rollback step", (b) "the plan touches exactly two systems", (c) "the plan's owner is inactive", (d) "testing happens after go-live".
+<details><summary>Key</summary>(a) absent (anchor → HAS_STEP → Step {kind:rollback}). (b) count_equals (TARGETS, n=2). (c) present to bind the owner (OWNS in), then attribute_equals on `role:owner`, active = false. (d) time_order.</details>
+
+**E31.** Why can't `FOLLOWS` be passed as `$rel`, and what protects against a malicious lesson?
+<details><summary>Key</summary>Relationship types shape the query plan, so Cypher doesn't allow them as parameters. The compiler only accepts names from the graph-model whitelist and rejects anything else.</details>
+
+**E32.** Prediction: the hero plan has NO alert channel recorded. What happens to A2.1, A2.2, A2.3, and k?
+<details><summary>Key</summary>A2.1 doesn't hold (nothing to bind). A2.2 and A2.3 are "unbound" and count as not holding, explained as "couldn't check: no channel recorded". k for Antibody 2 drops to at most 1 (only A2.4 could hold).</details>
+
+**E33.** The plan has two alert channels: one pager watched by on-call, one unwatched email list. Which does the evaluator bind as `ch`, and why?
+<details><summary>Key</summary>It evaluates the dependents for both and keeps the candidate giving the highest k: the unwatched email list (A2.2 and A2.3 both hold). Ties go to the smallest id. The explanation names the chosen channel.</details>
+
+**E34.** Status words: k=5/5? k=4/5 with the completion missing? k=4/5 with A1.1 missing?
+<details><summary>Key</summary>Full; foresight; strong.</details>
+
+**Self-check:**
