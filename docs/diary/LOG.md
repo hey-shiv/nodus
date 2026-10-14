@@ -852,3 +852,37 @@ Anything you tune (the baseline's threshold) is tuned on dev. Test is touched on
 numbers are an honest estimate rather than something you've fitted to.
 
 **Q&A:** none.
+
+---
+
+## Step 24: T33–T35, keyword comparison, README, disclosures (03:59)
+
+**What:**
+- **Plans page:** a "Compare with keyword search" table. On the demo plans, keyword search
+  ranks the **control** (dock sensor) closest to the CrowdStrike/Cloudflare lesson (0.21), the
+  **hero** at 0.07, and the **map tile** plan at 0.00. NODUS raises the hero and the map plan and
+  stays quiet on the control. That's storyboard frame 6, built from the same baseline as the evaluation.
+- **README:** what it is, why the graph can't be removed, a 5-minute quick start, the graph
+  model, the **actual compiled Cypher** for the hero plan, the witness walk, the echo-memory
+  query, verified FalkorDB behaviours, evaluation counts with their limits, limitations,
+  sources, tracks, disclosures, layout.
+- **AI_USE.md / DATA.md:** what the AI may and may not do in the product; the demo lessons were
+  hand-authored and passed the same checks; all four public sources with what each is used for.
+- **Local Gemma 4 12B** finished downloading and answers through `scripts/llm_check.py`. A real
+  draft of the E1 lesson is running in the background.
+
+**Why the README shows compiled queries, not hand-written ones:** the rules ask for "the Cypher
+queries the product depends on". Printing what `compile_condition` actually produces means the
+README can't drift from the code.
+
+**Q&A:**
+- **Q (me): Can we use this model somewhere? https://github.com/NandhaKishorM/laya**
+  A: Laya is a classifier (not a chatbot): it answers typed questions about a text, such as
+  *choice* (pick a label), *score* or *yes/no*, with a calibrated probability, in one pass. The
+  models are 322M–421M-parameter encoders, Apache-2.0, and run on CPU at about 0.2–0.5 s per call.
+  The best fit is NODUS's biggest stated limitation: **roles are given, not extracted.**
+  Laya could *suggest* a plan's controlled-vocabulary roles from its text (risk class, change
+  type, alert channel kind) and categorise dismissal reasons for the learning loop. The guard
+  rail: a suggestion is never used for matching until a person confirms it, otherwise words
+  would leak back into a structure-only decision (the control plan "sounds" risky). Cost: PyTorch
+  plus about 1–2 GB of checkpoints on a slow connection. Recorded as an option for me to decide.

@@ -60,6 +60,26 @@ for pid, title, summary, risk, owner in sorted(plans, key=lambda p: (p[0] not in
         if is_warning(lvl) and cols[1].button("Open echo", key=f"open-{pid}-{les['id']}"):
             open_echo(pid, les["id"])
 
+with st.expander("Compare with keyword search"):
+    from pathlib import Path
+
+    from nodus.baseline import keyword_ranking
+    from nodus.lessons import load_lesson_file
+    files = sorted((Path(__file__).resolve().parent.parent / "data" / "lessons").glob("*.json"))
+    names = {les["id"]: les["name"] for les in lessons}
+    st.write("A keyword search ranks plans by how much their words overlap a lesson's text "
+             "(TF-IDF similarity; the evaluation's baseline). NODUS ignores the words and checks "
+             "the structure.")
+    table = []
+    for rpid, rlid, sim in keyword_ranking([load_lesson_file(f) for f in files],
+                                          [(p[0], p[1], p[2]) for p in plans]):
+        raised = [names[l] for (pp, l), (_, lvl) in results.items() if pp == rpid and is_warning(lvl)]
+        table.append({"Plan": next(p[1] for p in plans if p[0] == rpid),
+                      "Closest lesson by words": names.get(rlid, rlid),
+                      "Word similarity": round(sim, 3),
+                      "NODUS raises": ", ".join(raised) or "nothing"})
+    st.dataframe(table, hide_index=True, use_container_width=True)
+
 st.header("Change a plan")
 st.write("Edit a plan as its owner would. Saving runs NODUS on the plan straight away.")
 titles = {pid: title for pid, title, *_ in plans}

@@ -1,11 +1,27 @@
-# Data policy
+# Data policy and sources
 
 NODUS uses only data the rules allow: public, synthetic, or my own.
 
-- **Synthetic company:** a fictional company (people, teams, plans, incidents),
-  generated during the event and labelled synthetic. Any resemblance to real people is unintended.
-- **Public post-mortems:** facts about famous public incidents, taken from the
-  companies' own published post-mortems and official reports, cited per fact.
-- **Never:** private, login-protected, paywalled or personal data.
+## Synthetic
+- **Tern & Tally Freight** (`nodus/world.py`, `docs/world-story.md`): a fictional company,
+  its people, systems, plans and incidents, generated during the event by a seeded script.
+  Every node carries `origin: synthetic`. Any resemblance to real people or companies is unintended.
+- **Internal post-mortems** (`data/postmortems/`): fictional, written for the demo.
+- **Evaluation families** (`eval/generate.py`): synthetic, seeded, in separate graphs.
 
-Sources will be listed here as they're added.
+## Public (cited, quoted verbatim, not redistributed)
+| Source | Used for |
+|---|---|
+| [Cloudflare: Details of the Cloudflare outage on July 2, 2019](https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/) | Antibody 1 |
+| [CrowdStrike: Falcon Content Update Remediation and Guidance Hub (Preliminary PIR)](https://www.crowdstrike.com/falcon-content-update-remediation-and-guidance-hub/) | Antibody 1 |
+| [U.S. SEC press release 2013-222 on Knight Capital](https://www.sec.gov/news/press-release/2013-222) | Antibody 2 |
+| [GitLab: Postmortem of database outage of January 31](https://about.gitlab.com/blog/postmortem-of-database-outage-of-january-31/) | Antibody 2 |
+
+Each lesson condition quotes one or more exact sentences (19 quotes in total), checked
+against the published pages with `scripts/verify_sources.py` on Oct 15, 2026. The page texts
+are cached locally for that check and are **gitignored**: NODUS cites these documents, it
+doesn't republish them. Wording is neutral: lessons describe a shape, not blame.
+
+## Never
+Private, login-protected, paywalled or personal data. No real person is named outside the
+public sources' own published text.

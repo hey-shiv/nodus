@@ -42,3 +42,18 @@ class TfIdf:
         na = math.sqrt(sum(v * v for v in va.values()))
         nb = math.sqrt(sum(v * v for v in vb.values()))
         return dot / (na * nb) if na and nb else 0.0
+
+
+def keyword_ranking(lessons, plans):
+    """[(plan_id, best_lesson_id, similarity)] sorted high to low, for the demo comparison.
+
+    lessons: nodus.lessons.Lesson objects; plans: [(plan_id, title, summary)].
+    """
+    texts = {les.id: lesson_text(les) for les in lessons}
+    model = TfIdf(list(texts.values()) + [f"{t} {s or ''}" for _, t, s in plans])
+    ranked = []
+    for pid, title, summary in plans:
+        sims = {lid: model.similarity(f"{title} {summary or ''}", t) for lid, t in texts.items()}
+        best = max(sims, key=sims.get)
+        ranked.append((pid, best, sims[best]))
+    return sorted(ranked, key=lambda r: -r[2])
