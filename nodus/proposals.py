@@ -36,6 +36,14 @@ target is {{"label": L, "props": {{...}}}} or {{"role": name}}.
 Allowed labels: {sorted(LABELS)}
 Allowed relationships: {sorted(RELATIONSHIPS)}
 Allowed properties: {sorted(PROPERTIES)}
+Example conditions (a toy library domain, shape only):
+{{"id": "C1", "text": "A loan has exactly one automated reminder", "kind": "count_equals",
+  "start": "anchor", "path": [["GATED_BY", "out"]], "target": {{"label": "Check"}}, "n": 1,
+  "all_targets": {{"kind": "automated"}}, "citations": [...]}}
+{{"id": "C2", "text": "Nobody active watches the desk inbox", "kind": "absent",
+  "start": "role:ch", "path": [["WATCHES", "in"]],
+  "target": {{"label": "Person", "props": {{"active": true}}}}, "citations": [...]}}
+"all_targets" and "props" are always objects; "completion" must equal one condition's "id".
 Rules: at least one "absent" condition; "completion" names the final step that completes
 the failure; every condition has "citations": [{{"doc": "{doc_id}", "quote": "<a sentence copied
 EXACTLY from the post-mortem>"}}]. Never invent or paraphrase a quote.

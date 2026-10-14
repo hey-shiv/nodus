@@ -939,3 +939,29 @@ good as its training, and here its confidence was low.
 - **Q (me): Add Laya as optional role suggestions that a human must confirm, plus dismissal-reason
   categories, and keep it optional.** A: Done as described. Reason categories are marked
   experimental because they measured near chance.
+
+---
+
+## Step 26: A real AI draft against the checks (04:13)
+
+**What:** ran `propose_lesson` for real, with local **Gemma 4 12B** on the E1 post-mortem.
+- **Attempt 1** (thinking on): timed out after 10 minutes.
+- **Attempt 2** (`think: false`): 3 drafts in 202 s, all **rejected**. Draft 1 named a completion step
+  that wasn't one of its conditions; drafts 2–3 wrote `"all_targets": true` instead of an object.
+- **Prompt fix:** added two worked example conditions (toy library domain, shape only) and the
+  rule "completion must equal a condition id". New test checks the prompt shows it.
+- **Attempt 3:** 3 drafts in 109 s, all **rejected**: each used a role (`role:owner`) before
+  any condition had bound it.
+
+**What it means:** the drafts were close (4–5 conditions, sensible kinds, real quotes), but a
+12B local model doesn't reliably follow a strict schema with cross-references. **Every bad draft
+was caught and quarantined before reaching a human.** That's the safety net working, and
+why the demo lessons are hand-authored (disclosed). A stronger model (Gemini, with a key) may
+pass; it goes through exactly the same checks.
+
+**First principles: why validation beats trust.**
+A model's output is a *proposal*. Pydantic checks the shape; the compiler dry-run checks the
+names and role order; the verbatim check catches invented quotes. Each check is cheap,
+deterministic and explains its failure, and the explanation is fed back for a retry.
+
+**Q&A:** none.

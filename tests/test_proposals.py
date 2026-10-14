@@ -77,3 +77,10 @@ def test_reply_is_cached(tmp_path):
     llm.complete_json("same prompt")
     llm.complete_json("same prompt")
     assert fake.calls == 1
+
+
+def test_prompt_shows_the_shape_of_object_fields():
+    from nodus.proposals import build_prompt
+    prompt = build_prompt("doc-pm-e1", "text", "x")
+    assert '"all_targets": {"kind": "automated"}' in prompt
+    assert '"completion" must equal one condition' in prompt

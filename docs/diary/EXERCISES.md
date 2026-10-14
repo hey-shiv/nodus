@@ -319,3 +319,15 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>`cmd | tail` returns tail's exit code, not cmd's. Check that the package imports (`python -c "import google.genai"`), or use `set -o pipefail`.</details>
 
 **Self-check:**
+
+---
+
+## Step 26: Real AI drafts
+
+**E76.** Gemma's drafts failed three different ways. Name them and which check caught each.
+<details><summary>Key</summary>Completion not among the conditions (pydantic model validator); `all_targets: true` instead of an object (pydantic field type); a role used before it was bound (model validator's bound-role check). None reached the database or a human.</details>
+
+**E77.** Why is "all drafts rejected" a good outcome for the product, even though it's a bad outcome for the model?
+<details><summary>Key</summary>It shows the checks work: an imperfect model can't put a malformed or unsupported lesson in front of a reviewer, let alone into matching.</details>
+
+**Self-check:**
