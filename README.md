@@ -60,6 +60,10 @@ Database commands: `docker compose down` stops it (data kept); `docker compose d
 Google AI Studio key (no billing) and/or a local model: `ollama pull gemma4:12b-it-qat`.
 Check with `.venv/bin/python scripts/llm_check.py`. The demo needs neither.
 
+**Optional Laya** (role suggestions a person must confirm; experimental reason sorting):
+`uv pip install --python .venv/bin/python -r requirements-laya.txt`. It appears under
+*Plans → Suggest roles from the plan's text*. See [ADR-008](docs/decisions/ADR-008-laya.md).
+
 **Tests:** `.venv/bin/pytest` (needs the database running; every test uses its own throwaway graph).
 
 ## Graph data model
@@ -186,7 +190,10 @@ stakes. The embedding baseline was declared but not run.
 ## Limitations
 
 - **Roles are given, not extracted.** Risk class, alert routes and procedures are recorded in
-  the synthetic world. A real deployment needs them from plan templates or extraction.
+  the synthetic world. A real deployment needs them from plan templates or extraction. An
+  optional [Laya](https://github.com/NandhaKishorM/laya) step *suggests* risk class and change
+  type from a plan's text (4 of 5 and 3 of 5 agreed with the recorded roles on the demo plans,
+  at low confidence). A suggestion never affects matching until a person confirms it.
 - **Absent means absent in the recorded graph.** NODUS can't see what was never recorded.
 - **Small, synthetic world;** four public incidents; hand-authored lessons (an LLM drafting
   path exists and is checked).
@@ -216,7 +223,7 @@ NODUS cites and summarises; it doesn't redistribute these pages (they're cached 
 - **Data:** see [DATA.md](DATA.md). Synthetic company plus cited public post-mortems; no private data.
 - **Pre-event work** was limited to learning, notes, research and diagrams, as rule 8 allows. This
   repository was created after the event started (first commit: Oct 15, 2026, 02:59 IST).
-- **Decisions:** [docs/decisions/](docs/decisions/) (ADR-001 to ADR-007).
+- **Decisions:** [docs/decisions/](docs/decisions/) (ADR-001 to ADR-008).
 
 ## Project layout
 
@@ -235,6 +242,7 @@ nodus/            the engine (no Streamlit imports)
   loader.py       idempotent UNWIND + MERGE
   llm.py          Gemini → local Gemma fallback, disk cache
   proposals.py    LLM lesson drafts, checked before storage
+  suggest.py      optional Laya role suggestions (human-confirmed) and reason guesses
   baseline.py     TF-IDF keyword baseline
   svg.py          the alignment picture (a pure function)
 app.py, app_pages/  Streamlit UI (no Cypher in page files)

@@ -16,6 +16,7 @@ CACHE = Path(__file__).resolve().parent.parent / "cache" / "llm"
 GEMINI_MODELS = os.environ.get("NODUS_GEMINI_MODELS", "gemini-3.8-flash,gemini-3.5-flash-lite")
 OLLAMA_MODEL = os.environ.get("NODUS_OLLAMA_MODEL", "gemma4:12b-it-qat")
 OLLAMA_URL = os.environ.get("NODUS_OLLAMA_URL", "http://localhost:11434")
+OLLAMA_TIMEOUT = int(os.environ.get("NODUS_OLLAMA_TIMEOUT", "900"))
 
 
 class LLMError(RuntimeError):
@@ -50,13 +51,14 @@ class Ollama:
         self.model, self.url = model, url
 
     def complete(self, prompt):
-        body = json.dumps({"model": self.model, "stream": False, "format": "json",
-                           "options": {"temperature": 0},
+        # think=False: Gemma 4 is a reasoning model; hidden "thinking" made drafts time out (T14).
+        body = json.dumps({"model": self.model, "stream": False, "format": "json", "think": False,
+                           "options": {"temperature": 0, "num_ctx": 8192, "num_predict": 3000},
                            "messages": [{"role": "user", "content": prompt}]}).encode()
         req = urllib.request.Request(f"{self.url}/api/chat", data=body,
                                      headers={"Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=600) as r:
+            with urllib.request.urlopen(req, timeout=OLLAMA_TIMEOUT) as r:
                 return json.loads(r.read())["message"]["content"]
         except Exception as e:
             raise LLMError(f"ollama: {e}") from e

@@ -86,29 +86,39 @@ def _clear(graph, eid, now):
                     "SET e.status = 'cleared', e.updated_at = $now", {"id": eid, "now": now})
 
 
-def acknowledge(graph, eid, by, outcome, reason="", now=None):
-    """The human step: the plan owner says what they did about the echo."""
+def acknowledge(graph, eid, by, outcome, reason="", now=None, categorise=None):
+    """The human step: the plan owner says what they did about the echo.
+
+    categorise: optional function reason -> (category, confidence), e.g. Laya
+    (nodus.suggest.categorise_reason). Only used to sort dismissal reasons for the track record.
+    """
     if outcome not in OUTCOMES:
         raise ValueError(f"outcome must be one of {OUTCOMES}")
     if outcome == "dismissed" and not reason.strip():
         raise ValueError("a dismissal needs a reason")
+    category, conf = (categorise(reason) if categorise and outcome == "dismissed"
+                      else (None, None))
     graph.query("MATCH (e:Echo {id: $id}) SET e.outcome = $outcome, e.reason = $reason, "
+                "e.reason_category = $category, e.reason_category_conf = $conf, "
                 "e.acknowledged_by = $by, e.acknowledged_at = $at, e.status = 'acknowledged'",
-                {"id": eid, "outcome": outcome, "reason": reason, "by": by,
-                 "at": now or int(time.time())})
+                {"id": eid, "outcome": outcome, "reason": reason, "by": by, "category": category,
+                 "conf": conf, "at": now or int(time.time())})
 
 
 def track_record(graph, lesson_id):
     """How this lesson's echoes went: raised, heeded, dismissed (with reasons), escalated, open."""
     rows = read(graph, "MATCH (e:Echo)-[o:OF_LESSON]->(l:Lesson {id: $id}) "
-                       "RETURN e.status, e.outcome, e.reason", {"id": lesson_id})
+                       "RETURN e.status, e.outcome, e.reason, e.reason_category", {"id": lesson_id})
     record = {"raised": len(rows), "heeded": 0, "dismissed": 0, "escalated": 0, "open": 0,
-              "reasons": []}
-    for status, outcome, reason in rows:
+              "reasons": [], "reason_categories": {}}
+    for status, outcome, reason, category in rows:
         if outcome:
             record[outcome] += 1
             if outcome == "dismissed":
                 record["reasons"].append(reason)
+                if category:
+                    cats = record["reason_categories"]
+                    cats[category] = cats.get(category, 0) + 1
         elif status == "open":
             record["open"] += 1
     return record

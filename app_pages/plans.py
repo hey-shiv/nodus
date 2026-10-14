@@ -116,6 +116,38 @@ if saved:
     st.session_state["last_save"] = (titles[pid], [(r["lesson_name"], r["level"]) for r in report])
     st.rerun()
 
+with st.expander("Suggest roles from the plan's text (optional: Laya)"):
+    from nodus import suggest
+    st.write("NODUS matches on recorded roles such as the risk class. Laya, a small local "
+             "classifier, can read the plan's text and *suggest* them. A suggestion changes "
+             "nothing until the owner confirms it, so a plan that only sounds risky can't "
+             "change a match.")
+    if not suggest.available():
+        st.caption("Laya isn't installed. To try it: `uv pip install --python .venv/bin/python "
+                   "-r requirements-laya.txt` (downloads about 1.7 GB on first use).")
+    else:
+        plan_row = next(p for p in plans if p[0] == pid)
+        if st.button("Suggest roles", key=f"suggest-{pid}"):
+            with st.spinner("Laya is reading the plan…"):
+                suggest.store_suggestions(g, pid, suggest.suggest_roles(
+                    f"{plan_row[1]}. {plan_row[2] or ''}"))
+        for role, info in suggest.suggestions_for(g, pid).items():
+            words = role.replace("_", " ")
+            line = (f"**{words}**: recorded *{info['recorded'] or 'not recorded'}*, Laya suggests "
+                    f"*{info['suggested']}* (confidence {info['confidence']:.2f})")
+            if info["recorded"] == info["suggested"]:
+                st.markdown(line + ": they agree.")
+            else:
+                c1, c2 = st.columns([4, 1])
+                c1.markdown(line)
+                if c2.button("Confirm", key=f"confirm-{pid}-{role}"):
+                    owner = plan_row[4] or "plan owner"
+                    suggest.confirm_role(g, pid, role, info["suggested"], owner)
+                    report = on_plan_saved(g, pid)
+                    st.session_state["last_save"] = (
+                        titles[pid], [(r["lesson_name"], r["level"]) for r in report])
+                    st.rerun()
+
 if "last_save" in st.session_state:
     name, raised = st.session_state["last_save"]
     if raised:

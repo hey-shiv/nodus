@@ -886,3 +886,56 @@ README can't drift from the code.
   rail: a suggestion is never used for matching until a person confirms it, otherwise words
   would leak back into a structure-only decision (the control plan "sounds" risky). Cost: PyTorch
   plus about 1–2 GB of checkpoints on a slow connection. Recorded as an option for me to decide.
+
+---
+
+## Step 25: Laya, optional role suggestions with a human check (04:08)
+
+**What:**
+- `nodus/suggest.py`: an optional wrapper around Laya's `Router.predict` (the API checked in
+  its README and PyPI page first; v0.4.7, Apache-2.0). `suggest_roles()` suggests a plan's
+  **risk class** and **change type**; `categorise_reason()` guesses a dismissal reason's category.
+- Suggestions are stored **beside** the real roles (`Plan.suggested_risk_class` and so on).
+  The matcher never reads them. `confirm_role()` (a person's click on **Confirm**) copies a value
+  into the real role, and then the agent re-runs.
+- UI: *Plans → Suggest roles from the plan's text*; the Inbox sorts dismissal reasons when
+  Laya is installed; Lessons shows the guesses, labelled experimental. Decision: ADR-008.
+- `requirements-laya.txt` keeps PyTorch and Laya out of the core install. 6 new tests with a
+  fake predictor (92 total), including **"a suggestion alone never changes the match"** and
+  **"confirming does"**.
+
+**Measured with the real model (honest numbers):**
+| Job | Result |
+|---|---|
+| risk class vs the recorded role, 5 demo plans | 4 of 5 agreed (scanner patch: "standard" instead of "routine") |
+| change type, 5 demo plans | 3 of 5 |
+| confidence | 0.10–0.33; Laya itself warned this checkpoint's confidence is partly uncalibrated |
+| dismissal reasons, 6 labelled examples (choice question) | 2 of 6 (near chance) |
+| dismissal reasons, yes/no questions | every answer exactly 0.50, so this question type isn't working with this checkpoint |
+
+**Why the guard rail matters (first principles):** NODUS's whole claim is that *structure,
+not words*, decides. Laya reads words. If its guess went straight into `risk_class`, a plan
+that merely *sounds* routine could switch on condition A1.1, and the control-plan problem
+comes back through the side door. Keeping suggestions in separate properties that no query
+reads, plus a confirm step, means words can *propose* and only a person can *decide*. That's
+the same rule as for LLM-drafted lessons.
+
+**First principles: a classifier vs a generative model.**
+Gemma *writes* text (it can say anything, so its output must be checked). Laya *chooses* from
+the options you give it (it can only answer "routine", "standard" or "high") and gives a
+probability. That makes it fast and safe to plug into a controlled vocabulary, but it's only as
+good as its training, and here its confidence was low.
+
+**Problems and fixes:**
+- **The Gemini SDK wasn't actually installed:** the earlier background install "succeeded"
+  because the shell pipe's last command (`tail`) succeeded, which hid the real failure.
+  Reinstalled (google-genai 2.30.1) and pinned it in `requirements.txt`.
+  **How to spot it next time:** check that the import works, not just the exit code.
+- **The local Gemma draft timed out (10 min):** Gemma 4 "thinks" before answering, and RAM was
+  shared with the Laya install. Fix: `think: false`, an output cap, and a configurable timeout
+  (`NODUS_OLLAMA_TIMEOUT`). Retrying.
+
+**Q&A:**
+- **Q (me): Add Laya as optional role suggestions that a human must confirm, plus dismissal-reason
+  categories, and keep it optional.** A: Done as described. Reason categories are marked
+  experimental because they measured near chance.

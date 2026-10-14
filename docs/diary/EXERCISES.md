@@ -298,3 +298,24 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>F1 texts share no words with the lessons (similarity 0), so the only way to catch them is t = 0, which also flags every F2 plan. The declared rule (maximise hits − false alarms) ties at that point: the baseline can't separate the families.</details>
 
 **Self-check:**
+
+---
+
+## Step 25: Laya
+
+**E71.** Why can't Laya's suggested risk class go straight into `Plan.risk_class`?
+<details><summary>Key</summary>Laya reads words. If its guess set a real role, a plan that only *sounds* routine could make A1.1 hold: wording would leak back into a structure-only decision. Suggestions live in separate properties that no query reads, until a person confirms.</details>
+
+**E72.** Prediction: Laya suggests "routine" for the dock-sensor plan (recorded "standard"), and nobody confirms. What's Antibody 1's k for that plan? And after Kai confirms?
+<details><summary>Key</summary>Unchanged (2 of 5) while it's only a suggestion. After confirmation A1.1 holds, so k = 3 of 5 (a note, still not raised). Both cases are tests in tests/test_suggest.py.</details>
+
+**E73.** Classifier vs generative model: what's the difference, and why does it matter here?
+<details><summary>Key</summary>A classifier picks from given labels with a probability; a generative model writes free text. Laya can only output allowed vocabulary values, which fits roles, but its accuracy and calibration still limit it (low confidence here).</details>
+
+**E74.** Laya sorted 2 of 6 dismissal reasons correctly. What did we do with that, and why not delete the feature?
+<details><summary>Key</summary>Kept it, as requested, but labelled experimental, shown next to the original reasons, and never used for any decision. Reporting the measured accuracy is more honest than hiding or overselling it.</details>
+
+**E75.** Why did a failed install report success, and how do you check properly?
+<details><summary>Key</summary>`cmd | tail` returns tail's exit code, not cmd's. Check that the package imports (`python -c "import google.genai"`), or use `set -o pipefail`.</details>
+
+**Self-check:**

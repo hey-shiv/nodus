@@ -15,6 +15,10 @@ Graph Hacks allows AI coding assistants if their use is disclosed. This is that 
 ## Inside the product
 - **What the AI may do:** draft a lesson from a post-mortem (`nodus/proposals.py`), using
   Gemini (free tier, optional key) or a local Gemma 4 model via Ollama.
+- **Optional Laya classifier** (`nodus/suggest.py`, Apache-2.0, runs locally): suggests a
+  plan's risk class and change type from its text, and guesses a category for dismissal reasons
+  (experimental, 2 of 6 right in our check). Suggestions are stored apart from the real roles;
+  the matcher ignores them until a person confirms one.
 - **What it may not do:** write the queries that run (a deterministic compiler does, from
   hand-written templates), decide a match or its severity (published rules do), approve or
   activate a lesson (only a person can, via `approve()`), or write the messages users see

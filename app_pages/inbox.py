@@ -3,6 +3,7 @@ import streamlit as st
 
 from app_pages.common import level_html, open_echo, setup
 from nodus.agent import acknowledge, messages_for
+from nodus import suggest
 from nodus.plans import people
 
 g = setup("Inbox")
@@ -43,7 +44,8 @@ for (eid, pid, ptitle, lid, lname, origin, lvl, k, n, headsup, silences, status,
             why = st.text_input("Reason (needed to dismiss)")
             if st.form_submit_button("Record my answer"):
                 try:
-                    acknowledge(g, eid, everyone[who], choice, why)
+                    sorter = suggest.categorise_reason if suggest.available() else None
+                    acknowledge(g, eid, everyone[who], choice, why, categorise=sorter)
                     st.rerun()
                 except ValueError as e:
                     st.error(f"Not recorded: {e}.")

@@ -27,6 +27,12 @@ for lid, name, origin, status, version, approved_by in rows:
                  f"{rec['dismissed']}, escalated {rec['escalated']}, open {rec['open']}.")
         for r in rec["reasons"]:
             st.caption(f"Dismissed because: {r}")
+        if rec["reason_categories"]:
+            names = {"mitigated_elsewhere": "already covered elsewhere",
+                     "does_not_apply": "lesson doesn't apply", "accepted_low_stakes": "low stakes, accepted",
+                     "other": "other"}
+            st.caption("Laya's guess at the reasons (experimental: 2 of 6 right in our check; the reasons above are what counts): " + ", ".join(
+                f"{names.get(c, c)} {n}" for c, n in rec["reason_categories"].items()))
     with st.expander("Conditions and sources", expanded=(status == "proposed")):
         for c in lesson_detail(g, lid):
             st.markdown(f"**{c['id']}** {c['text']}" + ("  ∅" if c["kind"] == "absent" else ""))
