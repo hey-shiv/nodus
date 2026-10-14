@@ -79,3 +79,27 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Maybe not. Only RDB snapshots are on (save after 60 s if 10000 changes, 300 s if 100, 3600 s if 1). Three writes 10 min ago may not be snapshotted yet; a clean `down` would have saved them. AOF would fix this.</details>
 
 **Self-check:**
+
+---
+
+## Step 9: Tiny-graph lab
+
+**E16.** Prediction: `(a)-[:R]->(b)` exists three times between the same a and b. What do `count(*)` (unnamed) and `count(r)` (named `[r:R]`) return on 6.0.2?
+<details><summary>Key</summary>Unnamed: 1 (only connectivity is checked). Named: 3 (each edge is walked).</details>
+
+**E17.** Why would that bug be especially dangerous for NODUS?
+<details><summary>Key</summary>Matching counts how many conditions hold (k of n). A wrong count gives a wrong k, so a wrong "completion step" or a missed echo, with no error message.</details>
+
+**E18.** Write the Cypher for "plans with no owner". What's the plan operator called, and what does it do?
+<details><summary>Key</summary>`MATCH (p:Plan) WHERE NOT (p)-[:OWNED_BY]->(:Person) RETURN p`. Anti Semi Apply: keep the row only if the inner pattern finds zero matches.</details>
+
+**E19.** What does a pytest fixture with `yield` do before and after the test?
+<details><summary>Key</summary>Before `yield`: setup (create the random-named graph), handed to the test. After `yield`: teardown (delete the graph), run even if the test fails.</details>
+
+**E20.** Why give each test graph a random name instead of using one graph called `lab`?
+<details><summary>Key</summary>No leftover data from another test (or an earlier run) can change the result, and tests can't interfere with each other or with real NODUS data.</details>
+
+**E21.** Native `date()` comparison worked. Why still store epoch integers?
+<details><summary>Key</summary>The docs conflict on temporal arithmetic and `datetime()` is undocumented; integers compare and subtract correctly with no surprises. Convert only for display.</details>
+
+**Self-check:**

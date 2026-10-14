@@ -273,3 +273,52 @@ snapshot; on start it loads it back. The volume is what kept `dump.rdb` between 
 
 **Open:**
 - Turn on AOF (append-only file) if crash safety for recorded outcomes matters? Decide at G4.
+
+---
+
+## Step 9: T06, the tiny-graph lab (03:25)
+
+**What:** wrote `tests/test_lab.py`, 12 small pytest tests that each check *one*
+FalkorDB behaviour NODUS will depend on, on a 2–5 node toy graph. A pytest **fixture**
+(`tests/conftest.py`) gives each test a fresh graph with a random name and deletes it
+afterwards. All 12 pass. Saved the EXPLAIN plans and a findings table to `docs/g1-lab.md`.
+Recorded the time decision as ADR-003.
+
+**Why:** the whole engine is "count how many conditions of a lesson a plan meets". If
+FalkorDB counts or negates differently from what I assume, every match is silently
+wrong, and nothing would crash to warn me. Ten minutes of tiny tests now beats a day
+of debugging matching later. The tests also stay in the repo as evidence for judges.
+
+**The headline finding:**
+`MATCH (a)-[:R]->(b) RETURN count(*)` over **two** parallel edges returns **1**. Name
+the relationship (`[r:R]`, `count(r)`) and it returns 2. The EXPLAIN plan shows why:
+unnamed, FalkorDB only checks that the nodes are *connected*; named, it walks each
+*edge*. Rule for NODUS: **always name relationships when counting**.
+
+**First principles: what's a pytest fixture?**
+A function marked `@pytest.fixture` that prepares something a test needs. A test asks
+for it just by having a parameter with the same name (`def test_x(graph):`). The code
+before `yield` runs before the test (create the graph); the code after runs afterwards,
+even if the test failed (delete it). So every test starts clean and leaves nothing behind.
+
+**First principles: what's EXPLAIN?**
+A database turns your Cypher into a *plan*: a tree of small steps (scan nodes with a
+label, filter, traverse an edge, aggregate). EXPLAIN shows that tree without running it.
+Read it bottom-up. It shows *how* the query will run, which is how you spot a wrong count
+before it happens.
+
+**First principles: why absence works as "Anti Semi Apply".**
+For each `Plan` node, FalkorDB tries the inner pattern ("has an owner?"). *Semi apply*
+keeps the row if the inner pattern finds at least one match; *Anti* semi apply keeps it
+if it finds **none**. That's exactly "this plan has no owner": a silence condition.
+
+**First principles: why reusing a variable gives consistent bindings.**
+In `MATCH (p)-[:OWNS]->(), (p)-[:APPROVES]->()`, both patterns use `p`, so they must
+be the *same* node. Only Alice (who owns *and* approves) matches; Bob, who only approves,
+doesn't. For NODUS, this is how "the person who ships the change is also the one who
+approves it" stays one person across conditions.
+
+**Q&A:** none.
+
+**Open:**
+- Indexes on `id` properties: add when the loader exists (T12).
