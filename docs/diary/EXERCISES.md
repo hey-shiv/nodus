@@ -58,3 +58,24 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Dependencies of dependencies. `freeze` pins them all, because any of them changing can break the app.</details>
 
 **Self-check:**
+
+---
+
+## Step 8: FalkorDB in Docker
+
+**E11.** Image, container, volume: one sentence each, with an analogy.
+<details><summary>Key</summary>Image = read-only template (a class). Container = a running instance with a throwaway writable layer (an object). Volume = storage kept outside the container and mounted in (an external hard drive you plug into each new object).</details>
+
+**E12.** Prediction: you run `docker compose down -v`, then `up -d`. Is the Probe node there? Why?
+<details><summary>Key</summary>No. `-v` deletes the named volume, which held `dump.rdb`. The new container starts with an empty data folder.</details>
+
+**E13.** What changes if the port line is `"6379:6379"` instead of `"127.0.0.1:6379:6379"`?
+<details><summary>Key</summary>Docker listens on all network interfaces, so other devices on the same network can reach the passwordless database. With 127.0.0.1, only this Mac can.</details>
+
+**E14.** Why pin by digest and not just by tag?
+<details><summary>Key</summary>A tag is a movable label the publisher can re-point; a digest is a hash of the exact image bytes, so it always means the same image.</details>
+
+**E15.** Prediction: Docker Desktop crashes 10 minutes after you recorded three outcomes. After restart, are they there?
+<details><summary>Key</summary>Maybe not. Only RDB snapshots are on (save after 60 s if 10000 changes, 300 s if 100, 3600 s if 1). Three writes 10 min ago may not be snapshotted yet; a clean `down` would have saved them. AOF would fix this.</details>
+
+**Self-check:**

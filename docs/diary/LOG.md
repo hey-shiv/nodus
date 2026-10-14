@@ -220,3 +220,56 @@ Redis protocol), streamlit 1.66.0, pytest 9.1.1, pydantic 2.14.1, python-dotenv 
 yet: creating the public GitHub repo is an outward action that needs my OK.
 
 **Why:** the first commit's timestamp (after 12:01 AM IST Oct 15) is the proof for rule 8.
+
+Pushed to the public repo https://github.com/hey-shiv/nodus (03:02).
+
+---
+
+## Step 8: T05, FalkorDB up, pinned and persistent (03:10)
+
+**What:**
+1. Checked Docker Hub: `6.0.2` is still the newest stable FalkorDB tag (`latest` has the
+   same digest; the `edge` tags are nightly builds, not stable).
+2. Pulled it and confirmed it's a native **arm64** image (no slow emulation on my Mac).
+3. Wrote `compose.yaml`: one service, the image pinned by tag *and* digest, both ports
+   bound to `127.0.0.1`, a named volume `nodus-data` at `/var/lib/falkordb/data`.
+4. Started it, created one test node, stopped and restarted the stack, and the node was
+   still there. Then deleted the test graph. Evidence in `docs/g1-lab.md`.
+5. Added start/stop/reset commands to the README, with the warning about `down -v`.
+
+**Why each choice:**
+- **Pin tag + digest:** a tag like `6.0.2` *can* be re-pushed by the publisher; a digest
+  (`sha256:…`) is a fingerprint of the exact bytes and can't change. Judges get the same database I tested.
+- **`127.0.0.1:` in ports:** without it, Docker listens on every network interface, so
+  anyone on the same café Wi-Fi could reach a database with no password. With it, only my Mac can.
+- **Named volume:** a container's own filesystem is thrown away when the container is
+  removed. The volume is storage Docker keeps separately, so data outlives the container.
+- **Persistence test:** "it should persist" is a belief; restarting and finding the node is evidence.
+
+**First principles: image vs container vs volume.**
+- **Image:** a read-only template, a snapshot of a filesystem with FalkorDB installed. Like a class.
+- **Container:** a running instance of the image, with a thin writable layer on top. Like
+  an object. Remove it and that writable layer is gone.
+- **Volume:** a folder Docker manages outside any container, mounted into it at a path.
+  The data lives here, so it survives the container being removed and recreated.
+- **Compose:** a YAML file describing containers, ports and volumes, so `docker compose up`
+  recreates the whole setup the same way every time instead of a long `docker run` command.
+
+**First principles: how did the node survive?**
+FalkorDB runs inside Redis, which keeps everything in memory (fast) and saves a
+snapshot file, `dump.rdb`, to the data folder. On a clean stop Redis writes that
+snapshot; on start it loads it back. The volume is what kept `dump.rdb` between the two containers.
+
+**Findings (things I didn't expect):**
+- Only snapshots are on (`appendonly no`). A *crash* loses writes since the last snapshot.
+  A clean `docker compose down` is safe.
+- The default **query timeout is 1 second**. Slow queries fail instead of hanging, which
+  shapes how matching queries get written.
+- Two old learning containers exist (stopped), from practice. They're not used and they
+  hold no NODUS data. Stopped containers don't take the ports.
+
+**Q&A:**
+- **Q (me): Create the public repo and push?** A: Yes → `hey-shiv/nodus`.
+
+**Open:**
+- Turn on AOF (append-only file) if crash safety for recorded outcomes matters? Decide at G4.

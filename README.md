@@ -20,4 +20,11 @@ python3.12 -m venv .venv
 uv pip install --python .venv/bin/python -r requirements.txt   # or: .venv/bin/pip install -r requirements.txt
 source .venv/bin/activate
 ```
-FalkorDB (Docker) setup: coming at the next step.
+### FalkorDB (Docker)
+Requires Docker Desktop running.
+```bash
+docker compose up -d      # start (http://localhost:3000 for the Browser)
+docker compose down       # stop, data kept
+docker compose down -v    # stop AND DELETE ALL DATA (reset)
+```
+The image is pinned to `falkordb/falkordb:6.0.2` by digest; ports are bound to 127.0.0.1 only.

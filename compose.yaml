@@ -1,0 +1,17 @@
+# NODUS database: one FalkorDB container, reachable only from this Mac.
+# Start: docker compose up -d      Stop (keeps data): docker compose down
+# WARNING: docker compose down -v ALSO DELETES THE DATA VOLUME.
+services:
+  falkordb:
+    # Pinned tag + digest: the exact image tested (latest stable on Oct 15, 2026).
+    image: falkordb/falkordb:6.0.2@sha256:107455e862a824e45e8e9f5a7fbfdf5e00a08b14e13eae2577c72fd9e3f59ba6
+    container_name: nodus-falkordb
+    ports:
+      - "127.0.0.1:6379:6379"   # database (Redis protocol): localhost only, never public
+      - "127.0.0.1:3000:3000"   # FalkorDB Browser UI: http://localhost:3000
+    volumes:
+      - nodus-data:/var/lib/falkordb/data   # FALKORDB_DATA_PATH inside the image
+    restart: unless-stopped
+
+volumes:
+  nodus-data:
