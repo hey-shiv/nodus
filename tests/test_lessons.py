@@ -21,7 +21,10 @@ def test_lesson_file_validates_and_compiles(path):
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
 def test_every_quote_is_verbatim(path):
     lesson = load_lesson_file(path)
-    if lesson.origin == "public" and not SOURCE_CACHE.exists():
+    sources = load_sources()
+    public = {c.doc for cond in lesson.conditions for c in cond.citations
+              if sources[c.doc]["origin"] == "public"}
+    if any(not (SOURCE_CACHE / f"{d}.txt").exists() for d in public):
         pytest.skip("public source texts not cached; run scripts/verify_sources.py")
     assert unverified_quotes(lesson, load_sources()) == []
 

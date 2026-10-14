@@ -91,7 +91,7 @@ needs it ([docs/graph-model.md](docs/graph-model.md), ADR-004). Every node has a
 1. **Lessons are data.** Each lesson has 3–6 conditions of four kinds: `present`, `absent`,
    `attribute_equals`, `count_equals` ([docs/condition-kinds.md](docs/condition-kinds.md)).
    Each condition quotes the sentence it comes from, verified word for word
-   (`scripts/verify_sources.py`: 19/19 quotes). A person approves a lesson before it is used.
+   (`scripts/verify_sources.py`: 19/19 quotes; for the SEC page set `NODUS_CONTACT="Your Name you@example.com"`, which sec.gov requires of automated requests). A person approves a lesson before it is used.
 2. **A deterministic compiler** (`nodus/compiler.py`) turns each condition into one
    parameterized query from a hand-written template. Labels and relationship types are
    checked against a whitelist; every value is a `$parameter`. **No AI writes a query that runs.**

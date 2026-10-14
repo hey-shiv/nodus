@@ -32,3 +32,22 @@ Oct 8, 2026, in my pre-event notes.
 
 ## Effect on decisions
 None. Concept (D01), deployment (D20) and tracks (D21) stand as planned.
+
+---
+
+# Final rules check (plan T37): Thu Oct 15, 04:18 IST
+
+Live rules and brief pages re-read. **No changes** since the morning check: same window
+(closes Oct 18, 11:59 PM IST), the same six submission items, AI disclosure (rules 11–13),
+data rules, and FalkorDB-as-primary (rules 2–3). Judging criteria and the submission form fields
+are still not published (managed from the WeMakeDevs panel). The blog side prize has no
+published deadline or venue.
+
+| Required item (rule 10) | Where it is |
+|---|---|
+| Public repository | https://github.com/hey-shiv/nodus |
+| README: setup + graph data model | README.md (Quick start; Graph data model) |
+| Cypher queries the product depends on | README.md "The Cypher NODUS depends on"; nodus/compiler.py |
+| Demo video | **to record** (docs/SUBMISSION.md has the script) |
+| Live deployment or complete local setup | Local setup, tested from a fresh clone on Oct 15 |
+| Track(s) entered | named in the form; recommendation in docs/SUBMISSION.md |

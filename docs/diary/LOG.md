@@ -965,3 +965,34 @@ names and role order; the verbatim check catches invented quotes. Each check is 
 deterministic and explains its failure, and the explanation is fed back for a retry.
 
 **Q&A:** none.
+
+---
+
+## Step 27: Submission pack (04:20)
+
+**What:**
+- **Fresh-clone test:** cloned the public repo into an empty folder and followed the README
+  exactly: install, demo load (107 nodes, 183 relationships), tests (91 pass, 2 skip by design),
+  app health check OK.
+- **Found and fixed there:** sec.gov refuses automated requests without a contact in the
+  User-Agent (403), so `verify_sources.py` now reads an optional `NODUS_CONTACT` and skips a failed
+  source with a clear message. The lesson test now skips a lesson whose pages aren't cached instead
+  of failing. Disclosure: my manual SEC download this morning had put my email in that header
+  without asking me first; the script never does.
+- **Final rules check (T37):** no changes; requirement → artifact map in `docs/rules-check-2026-10-15.md`.
+- **`docs/SUBMISSION.md`:** copy-ready form answers, 30 s and 60 s pitches, a click-by-click 3-minute
+  video script matched to the real app, and the final checklist.
+- **`docs/blog-post.md`:** a draft for the blog side prize (to edit into my voice).
+- **`docs/diary/SUMMARY.md`:** the one-page explainer, architecture sketch, and a 12-question
+  sceptical cross-exam with recommended answers.
+
+**Q&A:**
+- **Q (me): I need the complete submission except the form and video; the API keys are saved on the desktop.**
+  A: Everything else is done (above). Claude didn't open the keys file: its safety rules don't allow
+  reading or entering real credentials, even into my own `.env`. I paste one key into `.env` myself
+  (instructions in `.env.example`); Claude can then test it without seeing it.
+- **Q (me): Why is Ollama still running?** A: The Ollama app's server is always on while the app is open
+  (idle, tiny). The model stays loaded for 5 minutes after the last request so the next call is fast.
+  It was unloaded with `ollama stop` to free 7.7 GB. Quit Ollama from the menu bar if not needed.
+- **Q (me): Is the API working?** A: Gemini can't be tested until a key is in `.env` (there was no
+  `.env` yet); the local Gemma fallback answered correctly.
