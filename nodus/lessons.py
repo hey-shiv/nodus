@@ -201,14 +201,14 @@ def lesson_detail(graph, lesson_id):
     """Conditions with their citations, for the approval page and the echo page."""
     rows = read(graph, "MATCH (l:Lesson {id: $id})-[h:HAS_CONDITION]->(c:Condition) "
         "OPTIONAL MATCH (c)-[r:CITES]->(d:Document) "
-        "RETURN c.cid, c.text, c.kind, c.order, d.id, d.title, d.url, d.origin, r.quote "
+        "RETURN c.cid, c.text, c.kind, c.order, d.id, d.title, d.url, d.origin, r.quote, d.publisher "
         "ORDER BY c.order", {"id": lesson_id})
     out = {}
-    for cid, text, kind, order, doc, title, url, origin, quote in rows:
+    for cid, text, kind, order, doc, title, url, origin, quote, publisher in rows:
         entry = out.setdefault(cid, {"id": cid, "text": text, "kind": kind, "citations": []})
         if doc:
-            entry["citations"].append({"doc": doc, "title": title, "url": url,
-                                       "origin": origin, "quote": quote})
+            entry["citations"].append({"doc": doc, "title": title, "url": url, "origin": origin,
+                                       "quote": quote, "publisher": publisher})
     return list(out.values())
 
 

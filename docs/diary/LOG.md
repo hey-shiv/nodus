@@ -768,3 +768,53 @@ Witnesses are never scored or shown as "who was right".
   condition and doesn't change k.
 
 **Q&A:** see step 20.
+
+---
+
+## Step 22: T24–T28, the Streamlit app, and the end-to-end path (03:48) → G4
+
+**What:** a five-page app (`streamlit run app.py`):
+| Page | What it does |
+|---|---|
+| Plans | A ledger of plans, each lesson shown as a **shape strip** (one dot per condition, filled when it holds, a dashed red ring for the missing completion step). A form lets the owner edit a plan; **Save** runs the agent. |
+| Echo | The alignment picture: the past failure's conditions beside what the plan contains, drawn by `nodus/svg.py` from the match result only. Plus the heads-up, silences, witness and every source sentence. |
+| Inbox | "Viewing as" a person: heads-ups on plans they own, invitations as a witness; the owner records heeded / dismissed (reason required) / escalated. |
+| Lessons | Each condition beside its quote; Approve / Reject; track record; "Draft a lesson" with the LLM (checked before it's stored). |
+| How it works | The method and the honest limits, in plain words. |
+Supporting modules: `nodus/plans.py` (plan reads and edits), `nodus/view.py` (match → display rows),
+`nodus/svg.py` (the pure drawing function), `app_pages/common.py` (cached connection, error guard, CSS).
+**No page file contains Cypher** (checked with grep). 92 tests green.
+
+**Clicked through in the browser (G4):** reset → Plans shows the hero "one step away" on all
+three lessons → added "rollout to every target" and saved → all three became **full** → Inbox
+(as Lena) showed the heads-ups with silences → recorded "Change the plan" → Lessons showed the
+track record "raised 1, heeded 1". The raw screen recording (plan T28) is for me to make.
+
+**Design choices (from the design pass):** lichen-paper background, slate ink, teal for
+"holds", violet for ∅ silence, red *only* for the completion step; one typeface (Atkinson
+Hyperlegible, built for legibility); no dashboard cards or KPI tiles. The headline is a plain
+sentence: "1 of 5 plans is one step from a known failure."
+
+**First principles: how Streamlit runs a page.**
+Every click re-runs the page script from top to bottom. Widgets return their current value
+on each run. So: `st.form` groups inputs so nothing happens until **Save** is pressed (no
+half-saved plans), `st.session_state` keeps small things between runs (which echo to open),
+and `st.cache_resource` keeps *one* database connection instead of reconnecting on every click.
+
+**First principles: why the SVG is a pure function.**
+`alignment_svg(lesson_name, plan_title, rows, k, n, level)` only turns rows into text. The
+rows come from `rows_for`, which comes from the match. So the picture can't show anything the
+graph didn't say, and pytest can check it ("the completion line is dashed red", "it says 4 of 5").
+
+**Problems and fixes:**
+- **The sidebar icon showed as the text "_arrow_right":** my font override also replaced
+  Streamlit's icon font. Fix: restore *Material Symbols* for icon elements.
+- **Edits to modules didn't show up:** Streamlit only reloads files automatically when a file
+  watcher is installed; without one, restart the server after editing modules.
+- **The step dropdown didn't register automated typing:** replaced it with radio buttons,
+  which is also one click instead of three for the demo.
+
+**Q&A:** none.
+
+**Open:**
+- **T28 insurance recording:** mine to do (screen recording of the path above).

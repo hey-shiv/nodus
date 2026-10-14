@@ -122,3 +122,26 @@ def inbox(graph):
         "RETURN e.id, p.id, p.title, l.id, l.name, e.level, e.k, e.n, e.headsup, e.status, "
         "e.outcome, e.reason, w.name, e.times_seen, e.updated_at "
         "ORDER BY e.updated_at DESC, e.id")
+
+
+def observe_all(graph, now=None):
+    """Run the loop for every current plan (used when the demo world is (re)loaded)."""
+    from nodus.watch import current_plans
+    return {plan: on_plan_saved(graph, plan, now) for plan in current_plans(graph)}
+
+
+def echo_record(graph, eid):
+    rows = read(graph, "MATCH (e:Echo {id: $id}) RETURN e.headsup, e.silences, e.status, "
+                       "e.outcome, e.times_seen", {"id": eid})
+    return rows[0] if rows else None
+
+
+def messages_for(graph, person_id):
+    """Echoes a person should see: on plans they own, or where they were invited."""
+    return read(graph,
+        "MATCH (e:Echo)-[a:ON_PLAN]->(p:Plan), (e)-[b:OF_LESSON]->(l:Lesson) "
+        "WHERE (:Person {id: $pid})-[:OWNS]->(p) OR (e)-[:INVITED]->(:Person {id: $pid}) "
+        "OPTIONAL MATCH (owner:Person)-[o:OWNS]->(p) "
+        "RETURN e.id, p.id, p.title, l.id, l.name, l.origin, e.level, e.k, e.n, e.headsup, "
+        "e.silences, e.status, e.outcome, e.reason, owner.id = $pid AS is_owner "
+        "ORDER BY e.updated_at DESC, e.id", {"pid": person_id})

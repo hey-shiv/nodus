@@ -256,3 +256,24 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Reasons are the learning signal: many dismissals with the same reason suggest the lesson is too broad, and a human reviews it (B10). A bare "dismiss" teaches nothing.</details>
 
 **Self-check:**
+
+---
+
+## Step 22: The app
+
+**E61.** What happens, step by step, when the owner presses **Save plan**?
+<details><summary>Key</summary>Streamlit re-runs the page with the form values → the page calls nodus.plans (set_follows, set_gate, remove_step, add_step) to write the plan → nodus.agent.on_plan_saved runs every approved lesson (read-only), computes severity, writes/updates Echo records with heads-up and witness → the page stores a summary in session_state and reruns to show the new state.</details>
+
+**E62.** Why is there no Cypher in the page files?
+<details><summary>Key</summary>Pages handle display only; all graph logic lives in modules that don't import Streamlit, so it can be tested with pytest and reused. It's also one place to review every query.</details>
+
+**E63.** Why use `st.form` for the plan editor?
+<details><summary>Key</summary>Without a form every widget change reruns the script immediately. A form batches the inputs and only acts when Save is pressed: one save, one agent run.</details>
+
+**E64.** Read the shape strip ●●●●◌ (last one a dashed red ring). What does it mean?
+<details><summary>Key</summary>Four of five conditions hold (filled dots; violet would be absences); the fifth is the completion step and is missing: foresight, "one step away".</details>
+
+**E65.** Prediction: you edit `nodus/svg.py` while the app is running and reload the browser. Do you see the change?
+<details><summary>Key</summary>Not without a file watcher: Streamlit keeps the imported module in memory. Restart the server (or install watchdog).</details>
+
+**Self-check:**

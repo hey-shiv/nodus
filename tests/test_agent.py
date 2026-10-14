@@ -96,3 +96,12 @@ def test_outcome_survives_a_later_save(world):
     on_plan_saved(world, "plan-hero")
     rows = [r for r in inbox(world) if r[0] == echo_id("antibody-1", "plan-hero")]
     assert rows[0][9:11] == ["acknowledged", "heeded"]
+
+
+def test_inbox_messages_for_owner_and_witness(world):
+    from nodus.agent import messages_for
+    on_plan_saved(world, "plan-hero")
+    lena = messages_for(world, "p-lena")
+    asha = messages_for(world, "p-asha")
+    assert len(lena) == 3 and all(row[-1] for row in lena)          # owner of all three
+    assert [(row[3], row[-1]) for row in asha] == [("internal-quiet-push", False)]
