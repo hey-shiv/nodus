@@ -701,3 +701,70 @@ echo several lessons, and here the extra echo is correct.
 **Open:**
 - Gemma 4 download still running; Gemini needs a key in `.env` (optional).
 - The CrowdStrike/A1.3 citation is an inference from a remediation step: say so on the Echo page.
+
+---
+
+## Step 20: LLM keys and model selection (03:42)
+
+**Q&A:**
+- **Q (me): How and where do I get the API keys, and is there a model selection procedure?**
+  A: Gemini key: aistudio.google.com/apikey → *Create API key* → copy it into `.env` as
+  `GEMINI_API_KEY=` (start from `.env.example`). Don't add billing, so nothing can be charged.
+  Never paste a key into a chat or commit it. Check with `scripts/llm_check.py`, which lists the
+  models the key can use and tests each one without printing the key.
+  Selection: Gemini first (if a key is set), trying `gemini-3.8-flash` then
+  `gemini-3.5-flash-lite` (checked against Google's model list today; the old default 2.5 Flash
+  is now limited to existing users), then local `gemma4:12b-it-qat`. Change the order with
+  `NODUS_GEMINI_MODELS` in `.env`.
+
+**First principles: why the key lives in `.env`.**
+A key is a password for a paid service. Code is public; `.env` is local and gitignored.
+`python-dotenv` reads `.env` into environment variables when the program starts, so the
+code asks for `os.environ["GEMINI_API_KEY"]` and the key itself never appears in the repo.
+
+---
+
+## Step 21: T19–T23, severity, silence, witnesses, the agent loop, memory (03:40)
+
+**What:**
+| Module | Its one job |
+|---|---|
+| `nodus/severity.py` | k, n and the missing list → full / foresight / strong / note / ignore (a pure function, the B6 table) |
+| `nodus/wording.py` | Fills sentence templates from match results; absences say "Not recorded in the company graph" |
+| `nodus/witnesses.py` | Whom to invite, by B8's rules in order; public lessons return their sources, never people |
+| `nodus/agent.py` | `on_plan_saved`: match → decide → heads-up + invitation → remember as an Echo; `acknowledge`; `track_record`; `inbox` |
+
+24 new tests (79 total, all green). On the demo world, saving the hero plan raises three
+**foresight** echoes. The internal one invites **Asha Rao** (she asked for a canary batch
+last time and was overruled). The public ones cite Cloudflare/CrowdStrike and Knight/GitLab.
+The silence lines read: *"∅ Not recorded in the company graph: nobody active is watching
+that channel ("tariff-errors@ list")"* and *"…an active owner for "tariff-errors@ list""*.
+
+**Why it's an agent, not a script:** it acts on connected data (the graph decides), it
+chooses whom to involve (witness routing walks lesson → episode → concern → person), and it
+**remembers**: each echo is a record with a stable id (`echo:<lesson>:<plan>`). Saving the
+plan again updates the same record (`times_seen` goes up). The human's outcome (heeded /
+dismissed with a reason / escalated) is kept, and the lesson's track record is counted from those outcomes.
+
+**Where the human decides:** approving a lesson; acknowledging an echo. The agent never
+edits a plan, never approves anything, never sends a message.
+
+**First principles: a pure function.**
+`level(k, n, missing, completion)` uses only its inputs: no database, no clock, no
+screen. Same inputs, same answer, forever. That makes it trivially testable (one test per
+table row) and it's why severity is a published *rule*, not an AI's opinion.
+
+**First principles: why graph distance isn't expertise.**
+"Closest person in the graph" sounds clever but means nothing: someone two hops away may
+just share a team. NODUS invites by *role in the original episode* (who warned, who wrote the
+post-mortem, who owns the system), which is a reason a human can read and agree with.
+Witnesses are never scored or shown as "who was right".
+
+**Design decisions:**
+- "Exactly half" counts as a *note* (`NOTE_SHARE = 0.5`), chosen on the demo world only.
+- When a plan is fixed so it no longer echoes, its old echo is kept and marked **cleared**
+  (memory isn't deleted).
+- The "no owner" silence is a *supporting* observation: it's shown, but it isn't a lesson
+  condition and doesn't change k.
+
+**Q&A:** see step 20.

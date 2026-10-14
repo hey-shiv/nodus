@@ -215,10 +215,11 @@ def lesson_detail(graph, lesson_id):
 def active_lessons(graph):
     """Approved lessons in the matcher's input shape, read back from the graph."""
     rows = read(graph, "MATCH (l:Lesson {status: 'approved'})-[h:HAS_CONDITION]->(c:Condition) "
-        "RETURN l.id, l.name, l.completion, c.cid, c.spec ORDER BY l.id, c.order")
+        "RETURN l.id, l.name, l.completion, l.origin, l.version, c.cid, c.spec, c.text "
+        "ORDER BY l.id, c.order")
     lessons = {}
-    for lid, name, completion, cid, spec in rows:
+    for lid, name, completion, origin, version, cid, spec, text in rows:
         les = lessons.setdefault(lid, {"id": lid, "name": name, "completion": completion,
-                                       "conditions": []})
-        les["conditions"].append({"id": cid, **json.loads(spec)})
+                                       "origin": origin, "version": version, "conditions": []})
+        les["conditions"].append({"id": cid, "text": text, **json.loads(spec)})
     return list(lessons.values())

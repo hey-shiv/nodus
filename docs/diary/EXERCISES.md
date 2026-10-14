@@ -229,3 +229,30 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Gemini raises LLMError, so the next provider (local Gemma via Ollama) is tried. If that answers, its reply is cached and returned; if not, an LLMError lists both failures.</details>
 
 **Self-check:**
+
+---
+
+## Steps 20–21: Keys, severity, witnesses, agent, memory
+
+**E54.** Where does the Gemini key live, how does the code read it, and why never in code?
+<details><summary>Key</summary>In `.env` (gitignored). python-dotenv loads it into the environment at startup; the code reads `os.environ["GEMINI_API_KEY"]`. Code is public; a committed key stays in Git history forever.</details>
+
+**E55.** Severity for: (a) 3/3, (b) 2/3 with the completion missing, (c) 2/3 with another missing, (d) 2/4, (e) 1/4?
+<details><summary>Key</summary>(a) full (b) foresight (c) strong (d) note (exactly half) (e) ignore.</details>
+
+**E56.** Why is `level()` a pure function, and what does that buy you?
+<details><summary>Key</summary>It depends only on its inputs: no database, clock or UI. Same input → same output, so one test per table row proves it, and severity is a visible rule rather than a judgement.</details>
+
+**E57.** The internal lesson's episode has: Asha (active, overruled concern), Tomas (active, wrote the post-mortem), Lena (owns the system). Who's invited? What if Asha leaves?
+<details><summary>Key</summary>Asha (rule 1). If she becomes inactive: Tomas (rule 2, author). If he leaves too: the active owner of a system the plan targets (rule 3). Otherwise nobody, shown honestly.</details>
+
+**E58.** Prediction: you save the hero plan 5 times. How many Echo nodes exist for it, and what's `times_seen`?
+<details><summary>Key</summary>3 Echo nodes (one per lesson, ids `echo:<lesson>:plan-hero`), each with times_seen = 5. MERGE on the stable id prevents duplicates.</details>
+
+**E59.** The owner adds the hero to the canary procedure and saves. What happens to the internal-lesson echo?
+<details><summary>Key</summary>Q.2 now fails → k = 3/5 → note (not a warning). The existing echo is kept and marked "cleared"; the memory isn't deleted.</details>
+
+**E60.** Why must a dismissal have a reason?
+<details><summary>Key</summary>Reasons are the learning signal: many dismissals with the same reason suggest the lesson is too broad, and a human reviews it (B10). A bare "dismiss" teaches nothing.</details>
+
+**Self-check:**

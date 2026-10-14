@@ -11,7 +11,9 @@ import urllib.request
 from pathlib import Path
 
 CACHE = Path(__file__).resolve().parent.parent / "cache" / "llm"
-GEMINI_MODEL = os.environ.get("NODUS_GEMINI_MODEL", "gemini-2.5-flash")
+# Tried in order: if one model's free quota is used up (or it isn't available to the
+# key), the next one is tried. Checked against Google's model list on Oct 15, 2026.
+GEMINI_MODELS = os.environ.get("NODUS_GEMINI_MODELS", "gemini-3.8-flash,gemini-3.5-flash-lite")
 OLLAMA_MODEL = os.environ.get("NODUS_OLLAMA_MODEL", "gemma4:12b-it-qat")
 OLLAMA_URL = os.environ.get("NODUS_OLLAMA_URL", "http://localhost:11434")
 
@@ -23,18 +25,22 @@ class LLMError(RuntimeError):
 class Gemini:
     name = "gemini"
 
-    def __init__(self, key, model=GEMINI_MODEL):
+    def __init__(self, key, models=GEMINI_MODELS):
         from google import genai
-        self.client, self.model = genai.Client(api_key=key), model
+        self.client = genai.Client(api_key=key)
+        self.models = [m.strip() for m in models.split(",") if m.strip()]
 
     def complete(self, prompt):
-        try:
-            resp = self.client.models.generate_content(
-                model=self.model, contents=prompt,
-                config={"response_mime_type": "application/json", "temperature": 0})
-        except Exception as e:          # quota, network, auth: let the next provider try
-            raise LLMError(f"gemini: {e}") from e
-        return resp.text
+        errors = []
+        for model in self.models:
+            try:
+                resp = self.client.models.generate_content(
+                    model=model, contents=prompt,
+                    config={"response_mime_type": "application/json", "temperature": 0})
+                return resp.text
+            except Exception as e:      # quota, unknown model, network: try the next model
+                errors.append(f"{model}: {str(e)[:120]}")
+        raise LLMError("gemini: " + " | ".join(errors))
 
 
 class Ollama:
