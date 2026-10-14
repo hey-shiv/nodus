@@ -84,3 +84,15 @@ def test_prompt_shows_the_shape_of_object_fields():
     prompt = build_prompt("doc-pm-e1", "text", "x")
     assert '"all_targets": {"kind": "automated"}' in prompt
     assert '"completion" must equal one condition' in prompt
+
+
+def test_cache_never_serves_one_providers_reply_for_another(tmp_path):
+    class Named(Scripted):
+        def __init__(self, name, *replies):
+            super().__init__(*replies)
+            self.name = name
+    local = Named("ollama", '{"from": "local"}')
+    LLM(providers=[local], cache_dir=tmp_path).complete_json("same prompt")
+    cloud = Named("gemini", '{"from": "cloud"}')
+    assert LLM(providers=[cloud], cache_dir=tmp_path).complete_json("same prompt") == '{"from": "cloud"}'
+    assert cloud.calls == 1

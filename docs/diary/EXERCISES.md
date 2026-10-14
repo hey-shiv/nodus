@@ -331,3 +331,15 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>It shows the checks work: an imperfect model can't put a malformed or unsupported lesson in front of a reviewer, let alone into matching.</details>
 
 **Self-check:**
+
+---
+
+## Step 28: Keys, caches, and a draft that passed
+
+**E78.** The Gemini draft passed every automatic check. Why isn't that enough to approve it?
+<details><summary>Key</summary>The checks prove shape, allowed names and verbatim quotes, not judgement. This draft dropped "sent to every depot at once" and picked a weak completion step. Only a person can decide whether it's the right lesson.</details>
+
+**E79.** A "Gemini" call returned in 0 seconds with Gemma's old answer. What was wrong, and what's the general rule?
+<details><summary>Key</summary>The cache key was only the prompt, so a reply from one model was served for another. Rule: a cache key must include everything that changes the answer (here, the provider and model).</details>
+
+**Self-check:**

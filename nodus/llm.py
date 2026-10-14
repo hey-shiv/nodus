@@ -66,7 +66,7 @@ class Ollama:
 
 def default_providers():
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(CACHE.parent.parent / ".env")   # the project's .env, wherever Python is started
     providers = []
     if os.environ.get("GEMINI_API_KEY"):
         providers.append(Gemini(os.environ["GEMINI_API_KEY"]))
@@ -81,13 +81,20 @@ class LLM:
         self.providers = providers if providers is not None else default_providers()
         self.cache_dir = Path(cache_dir)
 
+    def _cache_file(self, provider, prompt):
+        # Keyed by provider and model too: a reply from one model must never be served
+        # as if another model had written it (bug found on Oct 15: Gemma's draft came back
+        # when Gemini was asked).
+        who = f"{provider.name}|{getattr(provider, 'model', '')}|{getattr(provider, 'models', '')}"
+        key = hashlib.sha256(f"{who}\n{prompt}".encode()).hexdigest()[:20]
+        return self.cache_dir / f"{key}.json"
+
     def complete_json(self, prompt):
-        key = hashlib.sha256(prompt.encode()).hexdigest()[:20]
-        cached = self.cache_dir / f"{key}.json"
-        if cached.exists():
-            return json.loads(cached.read_text())["reply"]
         errors = []
         for p in self.providers:
+            cached = self._cache_file(p, prompt)
+            if cached.exists():
+                return json.loads(cached.read_text())["reply"]
             try:
                 reply = p.complete(prompt)
             except LLMError as e:

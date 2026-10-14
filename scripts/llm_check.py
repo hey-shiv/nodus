@@ -12,7 +12,7 @@ from dotenv import load_dotenv  # noqa: E402
 
 from nodus.llm import GEMINI_MODELS, OLLAMA_MODEL, LLMError, Gemini, Ollama  # noqa: E402
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 TEST = 'Reply with JSON only: {"ok": true}'
 
 key = os.environ.get("GEMINI_API_KEY")
@@ -20,8 +20,13 @@ if not key:
     print("Gemini: no GEMINI_API_KEY in .env (optional)")
 else:
     from google import genai
-    names = sorted(m.name.removeprefix("models/") for m in genai.Client(api_key=key).models.list()
-                   if "generateContent" in (m.supported_actions or []))
+    client = genai.Client(api_key=key)   # keep a reference: a temporary client closes mid-listing
+    try:
+        names = sorted(m.name.removeprefix("models/") for m in client.models.list()
+                       if "generateContent" in (m.supported_actions or []))
+    except Exception as e:
+        print(f"Gemini: the key was rejected or unreachable ({type(e).__name__}: {str(e)[:160]})")
+        names = []
     print(f"Gemini: key works; {len(names)} text models available, e.g.:",
           ", ".join(n for n in names if "flash" in n)[:400])
     for model in GEMINI_MODELS.split(","):

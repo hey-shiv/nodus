@@ -996,3 +996,36 @@ deterministic and explains its failure, and the explanation is fed back for a re
   It was unloaded with `ollama stop` to free 7.7 GB. Quit Ollama from the menu bar if not needed.
 - **Q (me): Is the API working?** A: Gemini can't be tested until a key is in `.env` (there was no
   `.env` yet); the local Gemma fallback answered correctly.
+
+---
+
+## Step 28: Gemini key, two bugs, and a real AI draft that passed (04:27)
+
+**What:**
+- I pasted **one** Gemini key into `.env` myself. Claude confirmed a key line exists without
+  printing it, and that `.env` is gitignored.
+- `scripts/llm_check.py`: the key works; `gemini-3.8-flash` and `gemini-3.5-flash-lite` both
+  answered, plus local Gemma.
+- **Real Gemini draft of the E1 lesson: ACCEPTED in 55 s.** Five conditions (routine; doesn't follow
+  the canary procedure; one automated check; alerts go to a channel; nobody watching), every quote
+  found verbatim.
+- **But a human review would change it:** it left out the key fact "sent to every depot at once"
+  and chose "nobody watching" as the completion step. The checks prove a draft is well-formed and
+  honestly quoted; only a person can judge whether it's the *right* lesson. That's exactly why
+  approval is a human step. The demo keeps the hand-authored lesson.
+
+**Bugs found and fixed:**
+1. **llm_check crashed** ("client has been closed"): the Gemini client was created inline, so Python
+   closed it while still listing models. Fix: keep a reference.
+2. **The LLM cache returned the wrong model's answer:** it was keyed only on the prompt, so asking
+   Gemini returned Gemma's earlier rejected draft in 0 seconds. Fix: the cache key now includes the
+   provider and model; a regression test proves one provider's reply is never served for another.
+   **How to spot it next time:** a "model call" that takes 0 s didn't call the model.
+3. `.env` is now loaded from the project folder explicitly, so it's found however Python is started.
+
+**Q&A:**
+- **Q (me): I have 5 keys from different accounts.** A: Use one; keep the others as spares if a key
+  breaks. Spreading load across accounts to beat free limits goes against Google's terms and risks
+  all the accounts. NODUS falls back to a second Gemini model, then local Gemma, so one key is enough.
+- **Q (me): How do I add it, exact steps?** A: `cp .env.example .env && open -e .env`, paste one key
+  after `GEMINI_API_KEY=`, save. Claude never reads or enters keys itself.
