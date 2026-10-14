@@ -818,3 +818,37 @@ graph didn't say, and pytest can check it ("the completion line is dashed red", 
 
 **Open:**
 - **T28 insurance recording:** mine to do (screen recording of the path above).
+
+---
+
+## Step 23: T30–T31, the evaluation (03:52) → G5
+
+**What:**
+1. Wrote `eval/DECLARATION.md` (questions, families, metrics, baselines, dev/test split) and
+   **committed it at 03:49:55, before any evaluation data existed**.
+2. `eval/generate.py` builds the families (seeded) in a separate graph per split;
+   `nodus/baseline.py` is the keyword baseline (TF-IDF, pure Python); `eval/run.py` runs both.
+3. Ran dev (to fix the baseline threshold), then **test once**. Results in `eval/RESULTS.md`.
+
+**Test results (synthetic):** NODUS: F1 hits 18/18, F2 false alarms 0/18, F4 0/10, F3
+foresight 20/20. Keyword baseline at its declared threshold: F1 18/18 but F2 18/18 and F4 10/10
+false alarms; at the smallest positive threshold: F1 1/18.
+
+**What it does and doesn't prove:** structure decides and wording doesn't, and the queries
+implement the lessons. It does *not* prove real-world accuracy: the families come from the
+same condition definitions, and roles are given, not extracted. The embedding baseline (B1)
+was not run. All of this is written in RESULTS.md.
+
+**Where NODUS loses:** a trivial footer-year change with the risky shape gets a **full** echo.
+Structure can't see stakes. Reported, not hidden.
+
+**First principles: why declare before running?**
+If you look at results and *then* decide what to measure, you can (even unknowingly) pick the
+measures that make you look good. Writing the questions, metrics and thresholds rule down
+first, with a timestamped commit, makes that impossible. Git is the notary.
+
+**First principles: dev/test split.**
+Anything you tune (the baseline's threshold) is tuned on dev. Test is touched once, so its
+numbers are an honest estimate rather than something you've fitted to.
+
+**Q&A:** none.

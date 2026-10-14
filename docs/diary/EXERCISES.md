@@ -277,3 +277,24 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Not without a file watcher: Streamlit keeps the imported module in memory. Restart the server (or install watchdog).</details>
 
 **Self-check:**
+
+---
+
+## Step 23: Evaluation
+
+**E66.** Why was the declaration committed before generating any evaluation data?
+<details><summary>Key</summary>So the questions, metrics and threshold rule can't be chosen after seeing results. The commit timestamp (earlier than the data) proves it.</details>
+
+**E67.** What do F1 and F2 test, and why do they need each other?
+<details><summary>Key</summary>F1: same structure, different words (does it find echoes text search misses?). F2: same words, different structure (does it stay quiet when text search panics?). A method that raises everything passes F1 and fails F2; one that raises nothing does the reverse. Together they show discrimination.</details>
+
+**E68.** NODUS scored perfectly. Give the honest reason this isn't proof it works on real companies.
+<details><summary>Key</summary>The families were generated from the same condition definitions the lessons use, and roles (risk class, alert routes) are given rather than extracted from messy real records. It proves the queries implement the lessons and that wording doesn't matter, not real-world accuracy.</details>
+
+**E69.** Where did NODUS lose, and what's the product answer?
+<details><summary>Key</summary>F5(a): a trivial footer-year change with the risky shape got a full echo; structure can't see stakes. Answer: dismissal reasons feed the track record for human refinement; a richer model could add an impact/blast-radius role.</details>
+
+**E70.** Why did the keyword baseline's threshold come out as 0?
+<details><summary>Key</summary>F1 texts share no words with the lessons (similarity 0), so the only way to catch them is t = 0, which also flags every F2 plan. The declared rule (maximise hits − false alarms) ties at that point: the baseline can't separate the families.</details>
+
+**Self-check:**
