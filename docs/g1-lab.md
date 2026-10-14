@@ -122,3 +122,122 @@ Distinct
                 Node By Label Scan | (p:P)
 ```
 
+
+## T09: Matching prototype (Oct 15, 2026, ~04:30 IST)
+
+Modules: `nodus/schema.py` (whitelist), `nodus/compiler.py` (one template per kind),
+`nodus/matcher.py` (anchor-first evaluator). Tests: `tests/test_matching.py`, **12 tests,
+all green** (24 total with the lab).
+
+| Test | Proves |
+|---|---|
+| all met → 5/5 `full` | k counts every holding condition |
+| hero → 4/5 `foresight`, missing `[A1.5]` | the completion step is named |
+| A1.3 missing instead → 4/5 `strong` | foresight only when the *completion* is what's missing |
+| binding trap | an unwatched channel on *another* plan's system is never borrowed |
+| two candidate channels → binds `ch-mail`, 3/4 | the branch with the highest k is kept |
+| absence holds / fails when an active watcher is added | silence detection both ways |
+| no alert channel → A2.2, A2.3 `unbound`, k = 0 | dependents are never true by default |
+| parallel `GATED_BY` edges → A1.4 fails | named-relationship counting (T06) |
+| unknown relationship → `CompileError` | whitelist works |
+| injection-shaped anchor id → not in query text | values are parameters |
+| unknown anchor → k = 0 | company-level conditions don't fire for a missing plan |
+
+**Finding during T09:** A1.2 ("other plans follow a staged procedure") is a fact about the
+company, so it held even for a plan id that doesn't exist (k = 1). `evaluate` now checks the anchor exists first.
+
+### Compiled queries and EXPLAIN plans
+#### A1.1: attribute_equals
+```
+MATCH (s:Plan) WHERE s.id = $start RETURN coalesce(s.risk_class = $value, false) AS holds, [s.id] AS ids
+params: {'start': 'hero', 'value': 'routine'}
+
+Project
+    Filter
+        Node By Label Scan | (s:Plan)
+```
+
+#### A1.2: present (other:Plan, binds proc)
+```
+MATCH (s:Plan) MATCH (s)-[r1:FOLLOWS]->(t:Procedure) WHERE s.id <> $anchor AND t.kind = $tp0 WITH DISTINCT t.id AS tid ORDER BY tid RETURN count(tid) > 0 AS holds, collect(tid) AS ids
+params: {'anchor': 'hero', 'tp0': 'staged_rollout'}
+
+Aggregate
+    Sort
+        Distinct
+            Project
+                Filter
+                    Conditional Traverse | (t)<-[r1:FOLLOWS]-(s:Plan)
+                        Filter
+                            Node By Label Scan | (t:Procedure)
+```
+
+#### A1.3: absent (target = bound role)
+```
+MATCH (s:Plan) WHERE s.id = $start OPTIONAL MATCH (s)-[r1:FOLLOWS]->(t) WHERE t.id = $target RETURN count(r1) = 0 AS holds, [s.id] AS ids
+params: {'start': 'hero', 'target': 'proc-staged'}
+
+Aggregate
+    Apply
+        Filter
+            Node By Label Scan | (s:Plan)
+        Optional
+            Filter
+                Conditional Traverse | (t)<-[r1:FOLLOWS]-(s:Plan)
+                    Argument
+```
+
+#### A1.4: count_equals
+```
+MATCH (s:Plan) WHERE s.id = $start OPTIONAL MATCH (s)-[r1:GATED_BY]->(t:Check) WITH count(r1) AS c, sum(CASE WHEN r1 IS NULL OR (coalesce(t.kind = $at0, false)) THEN 0 ELSE 1 END) AS bad, collect(DISTINCT t.id) AS ids RETURN c = $n AND bad = 0 AS holds, ids
+params: {'start': 'hero', 'n': 1, 'at0': 'automated'}
+
+Project
+    Aggregate
+        Optional Conditional Traverse | (t)<-[r1:GATED_BY]-(s:Plan)
+            Filter
+                Node By Label Scan | (s:Plan)
+```
+
+#### A2.1: present (2 hops, binds ch)
+```
+MATCH (s:Plan) MATCH (s)-[r1:TARGETS]->(n1)-[r2:ALERTS_TO]->(t:Channel) WHERE s.id = $start WITH DISTINCT t.id AS tid ORDER BY tid RETURN count(tid) > 0 AS holds, collect(tid) AS ids
+params: {'start': 'hero'}
+
+Aggregate
+    Sort
+        Distinct
+            Project
+                Conditional Traverse | (n1)-[r2:ALERTS_TO]->(t:Channel)
+                    Conditional Traverse | (s)-[r1:TARGETS]->(n1)
+                        Filter
+                            Node By Label Scan | (s:Plan)
+```
+
+#### A2.3: absent (incoming, filtered)
+```
+MATCH (s) WHERE s.id = $start OPTIONAL MATCH (s)<-[r1:WATCHES]-(t:Person) WHERE t.active = $tp0 RETURN count(r1) = 0 AS holds, [s.id] AS ids
+params: {'start': 'ch-mail', 'tp0': True}
+
+Aggregate
+    Apply
+        Filter
+            All Node Scan | (s)
+        Optional
+            Filter
+                Conditional Traverse | (t)-[r1:WATCHES]->(s)
+                    Argument
+```
+
+## G1 gate check (end of day 1 engine)
+
+| Condition | Status |
+|---|---|
+| Pinned FalkorDB on localhost, persistence verified | ✅ T05 |
+| Per-condition matching gives the expected k of n with consistent bindings, tested by pytest | ✅ T09 (12 tests) |
+| Undocumented behaviours verified or avoided | ✅ T06 (12 tests) + map-property and pattern-as-value findings |
+| D25 decided | ✅ Lite (ADR-002), re-confirmed: solo, prep incomplete |
+| EXPLAIN outputs saved | ✅ above |
+| Codex independent review of the ★ cards | ⏳ not done yet (needs the user to run Codex) |
+
+**G1: passed**, except the Codex review, which is pending.

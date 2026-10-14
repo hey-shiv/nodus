@@ -154,3 +154,30 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Full; foresight; strong.</details>
 
 **Self-check:**
+
+---
+
+## Step 12: Matching prototype
+
+**E35.** What's each module's one job? (`schema`, `compiler`, `matcher`)
+<details><summary>Key</summary>schema: the whitelist of names. compiler: one condition → one parameterized query. matcher: run a lesson's conditions for one anchor, in order, and count k of n.</details>
+
+**E36.** Why write the test before the code, and why must you see it fail first?
+<details><summary>Key</summary>The test fixes the definition of success before code can bend it. Seeing it fail proves the test can detect the missing behaviour; a test that never fails proves nothing.</details>
+
+**E37.** Prediction: you delete `(:Person {id:'ex-employee'})` from the hero world. Antibody 2's k?
+<details><summary>Key</summary>Still 3 of 4: A2.3 counts only active watchers, and the ex-employee was inactive. Removing them changes nothing.</details>
+
+**E38.** Prediction: the hero's only gate becomes `kind:'human'`. Antibody 1's k and status?
+<details><summary>Key</summary>A1.4 fails (not all gates automated) and A1.5 is still missing: k = 3 of 5, partial.</details>
+
+**E39.** Read `compile_condition` for A1.1 with anchor `hero`. Write the exact query text and params.
+<details><summary>Key</summary>`MATCH (s:Plan) WHERE s.id = $start RETURN coalesce(s.risk_class = $value, false) AS holds, [s.id] AS ids` with params `{'start': 'hero', 'value': 'routine'}`.</details>
+
+**E40.** Why `coalesce(s.prop = $value, false)`?
+<details><summary>Key</summary>If the property is missing, `s.prop = $value` is null, not false. coalesce turns null into false, so "no data" never counts as holding.</details>
+
+**E41.** Why did an unknown plan id first score k = 1?
+<details><summary>Key</summary>A1.2 checks *other* plans following a staged procedure, a company-level fact that doesn't depend on the anchor. Fix: verify the anchor exists before evaluating.</details>
+
+**Self-check:**

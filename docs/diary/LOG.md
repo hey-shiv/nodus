@@ -423,3 +423,61 @@ be of primitive types or arrays of primitive types"), but arrays work. So a cond
 
 **Open:**
 - Does the internal lesson (T14) need `time_order`? If not, it stays unbuilt.
+
+---
+
+## Step 12: T09, the matching prototype, test-first (04:30) → G1
+
+**What:** built the heart of NODUS, three small modules, each with one job:
+
+| Module | Its one job |
+|---|---|
+| `nodus/schema.py` | Lists the allowed labels, relationship types and property names (the whitelist). |
+| `nodus/compiler.py` | Turns one condition (data) into one parameterized Cypher query. |
+| `nodus/matcher.py` | Runs a lesson's conditions for one anchor plan, in order, and counts k of n. |
+
+Plus `pyproject.toml` (so pytest can import `nodus`) and `tests/test_matching.py`
+(12 tests). Wrote the tests **first**, watched them fail (red), wrote the code, watched
+them pass (green). 24/24 tests pass. G1 is passed except the Codex review (`docs/g1-lab.md`).
+
+**Why test-first:** the tests *are* the spec. "Hero = 4 of 5, foresight, missing A1.5" is
+written down before any code exists, so the code can't quietly redefine success. A
+failing test first also proves the test can fail; a test that never fails proves nothing.
+
+**How the code works (read along in the files):**
+1. `evaluate(graph, anchor, lesson)` first checks the anchor plan exists.
+2. `_run` takes the first condition. If it needs a role (`role:ch`) that isn't bound
+   yet, it's marked `unbound` (counts as not holding).
+3. Otherwise `compile_condition` builds the query: `_start` makes the start node
+   (`anchor`, `role:x`, or `other:Label`), `_path` adds 1–2 named hops (`r1`, `r2`) and
+   target filters, and each kind adds its RETURN. Every value goes into `params`; every
+   name is checked against `schema.py`.
+4. The query runs with `ro_query` (read-only). It always returns `holds` and `ids`.
+5. If the condition binds a role (`bind: "ch"`) and found several candidates, `_run`
+   tries the rest of the lesson once per candidate and keeps the best k.
+6. `_status` turns k, n and the missing list into full / foresight / strong / partial.
+
+**First principles: red → green → refactor.**
+Red: write a test for behaviour that doesn't exist; it fails. Green: write the least code
+that makes it pass. Refactor: tidy up while the tests stay green. Each green run is a save
+point: if a later change breaks something, a test turns red and points at it.
+
+**First principles: recursion for the "two candidates" case.**
+`_run` handles one condition, then calls itself on the rest of the list. When a binder
+finds two channels, it calls itself twice (once with each channel bound) and compares
+the results. Each call is a smaller version of the same problem, ending when the list is empty.
+
+**Problems and fixes:**
+- **pytest couldn't import `nodus`** (expected at the red step). Fix: `pythonpath = ["."]`
+  in `pyproject.toml`.
+- **Unknown anchor crashed** with `IndexError`: a query on a missing node returns *zero
+  rows*, and the code assumed one. Fix: no rows → doesn't hold.
+- **Unknown anchor scored k = 1:** A1.2 is a company-level fact, true whatever the plan.
+  Fix: `evaluate` checks the anchor exists before evaluating anything. Found by writing
+  the test before trusting the code.
+
+**Q&A:** none.
+
+**Open:**
+- **Codex review** of T06–T09 (the plan asks for an independent review of ★ cards).
+- Lessons are test data for now; storing and loading them from FalkorDB comes at T14–T17.
