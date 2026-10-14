@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 from nodus.compiler import CompileError
 from nodus.lessons import Lesson, check_compiles, unverified_quotes
-from nodus.schema import LABELS, PROPERTIES, RELATIONSHIPS
+from nodus.schema import ENDS, KIND_BY_LABEL, LABELS, PROPERTIES, RELATIONSHIPS, VOCAB
 
 QUARANTINE = Path(__file__).resolve().parent.parent / "cache" / "quarantine"
 
@@ -35,7 +35,13 @@ path is a list of [RELATIONSHIP, "out"|"in"] with 1 or 2 hops.
 target is {{"label": L, "props": {{...}}}} or {{"role": name}}.
 Allowed labels: {sorted(LABELS)}
 Allowed relationships: {sorted(RELATIONSHIPS)}
-Allowed properties: {sorted(PROPERTIES)}
+Filters ("props", "all_targets", attribute_equals) may ONLY use these properties and values:
+{json.dumps({k: sorted(map(str, v)) for k, v in VOCAB.items()})}  (active is true/false)
+"kind" values depend on the label: {json.dumps({k: sorted(v) for k, v in KIND_BY_LABEL.items()})}
+Relationships connect only these labels (from -> to): {json.dumps(ENDS)}
+For example a plan's alerts are reached as Plan -TARGETS-> System -ALERTS_TO-> Channel.
+Never filter on names or titles. "other:<Label>" starts are only for a "present" condition that
+binds a role; conditions about the plan's own things start at "anchor" or a bound "role:".
 Example conditions (a toy library domain, shape only):
 {{"id": "C1", "text": "A loan has exactly one automated reminder", "kind": "count_equals",
   "start": "anchor", "path": [["GATED_BY", "out"]], "target": {{"label": "Check"}}, "n": 1,
@@ -44,6 +50,10 @@ Example conditions (a toy library domain, shape only):
   "start": "role:ch", "path": [["WATCHES", "in"]],
   "target": {{"label": "Person", "props": {{"active": true}}}}, "citations": [...]}}
 "all_targets" and "props" are always objects; "completion" must equal one condition's "id".
+The completion step is the plan's final ACTION that turns the risk into the failure, usually
+a step the plan takes (for example a rollout to every target: a "present" condition on a Step),
+not a background state such as a missing owner. Include it even if the post-mortem mentions it
+only once, and quote the sentence that describes it.
 Rules: at least one "absent" condition; "completion" names the final step that completes
 the failure; every condition has "citations": [{{"doc": "{doc_id}", "quote": "<a sentence copied
 EXACTLY from the post-mortem>"}}]. Never invent or paraphrase a quote.

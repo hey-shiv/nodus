@@ -343,3 +343,18 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>The cache key was only the prompt, so a reply from one model was served for another. Rule: a cache key must include everything that changes the answer (here, the provider and model).</details>
 
 **Self-check:**
+
+---
+
+## Step 29: Stricter checks
+
+**E80.** Why does an "absent" condition on `Procedure {name: "canary procedure"}` cause false alarms on every plan?
+<details><summary>Key</summary>No node has that name, so the pattern never matches, and "absent" (zero matches) is always true. Filters must use controlled vocabularies that the data actually uses.</details>
+
+**E81.** What does path type-checking catch? Give the example from today.
+<details><summary>Key</summary>Hops that can't exist in the model, e.g. Plan -ALERTS_TO-> Channel. Alerts come from the System (Plan -TARGETS-> System -ALERTS_TO-> Channel), so that condition could never hold.</details>
+
+**E82.** The final AI draft passed all checks but missed the hero. Why, and whose job was it to catch?
+<details><summary>Key</summary>Its "nobody watches" condition counted any watcher, including an inactive one (Ravi left). That's a judgement error, not a type error, so it's the human reviewer's job at approval.</details>
+
+**Self-check:**

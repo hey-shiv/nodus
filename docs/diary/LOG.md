@@ -1029,3 +1029,38 @@ deterministic and explains its failure, and the explanation is fed back for a re
   all the accounts. NODUS falls back to a second Gemini model, then local Gemma, so one key is enough.
 - **Q (me): How do I add it, exact steps?** A: `cp .env.example .env && open -e .env`, paste one key
   after `GEMINI_API_KEY=`, save. Claude never reads or enters keys itself.
+
+---
+
+## Step 29: Stricter lesson checks, from reading an AI draft closely (04:32)
+
+**Why this step happened:** Gemini's first accepted draft *passed* every check, yet reading its specs
+showed conditions that would silently misbehave. Each one revealed a check that was missing.
+
+| What the draft did | Why it's wrong | New check |
+|---|---|---|
+| `Procedure {name: "canary procedure"}` | No node has that name, so "absent" holds on **every** plan (a false alarm everywhere) | Filters only on controlled-vocabulary properties and values (`schema.VOCAB`) |
+| `scope: "all depots"` | Not a vocabulary value; never matches | Same |
+| `start: other:Channel` on an absence | Not tied to the plan at all | `other:` only for a "present" condition that binds a role |
+| `Procedure {kind: "canary"}` | "canary" is a *Step* kind; procedures are `staged_rollout` | `kind` checked per label (`schema.KIND_BY_LABEL`) |
+| `Plan -ALERTS_TO-> Channel` | Alerts come from the System: Plan -TARGETS-> System -ALERTS_TO-> Channel | **Path type-checking** against which labels each relationship connects (`schema.ENDS`) |
+
+The prompt now also lists the vocabularies and the relationship map, and explains what a completion
+step is (the plan's final *action*, not a background state). 7 new tests; 100 pass; the three
+hand-written lessons still pass every stricter check.
+
+**The final Gemini draft (accepted in 33 s) is sound by type:** routine; doesn't follow the staged
+procedure; the targeted system alerts to an email list; nobody watches it; the completion step is a
+rollout to all targets. **Run against the demo world, it scores the hero only 3/5 and stays quiet.** Its
+"nobody watches" condition counts *any* watcher, including Ravi, who has left. The hand-written lesson
+counts only *active* watchers and catches the hero at 4/5. Both ignore the control (1/5 and 3/5).
+
+**First principles: type checks vs judgement.**
+A type check asks "can this condition ever be true in our model?" (does Plan have an ALERTS_TO
+relationship? is "canary" a procedure kind?). A machine can answer that completely. Judgement asks
+"is this the right condition?" (should an ex-employee count as watching?). That needs someone who
+understands the failure. NODUS automates the first and makes the second an explicit approval step.
+
+**Q&A:**
+- **Q (me): Yes, fix.** A: Fixed the draft quality at the root: stricter checks plus a better prompt.
+  The remaining difference (active watchers) is a reviewer's call, which the approval page exists for.

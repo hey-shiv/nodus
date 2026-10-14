@@ -58,3 +58,42 @@ def test_only_approved_lessons_are_active_and_edits_bump_version(graph):
     edited = lesson.model_copy(update={"summary": lesson.summary + " Edited."})
     assert store(graph, edited, sources) == 2                     # edit: new version...
     assert active_lessons(graph) == []                            # ...needs approval again
+
+
+def _a1():
+    return load_lesson_file(Path("data/lessons/antibody-1.json")).model_dump()
+
+
+def test_free_text_filter_is_refused():
+    data = _a1()
+    data["conditions"][1]["target"]["props"] = {"name": "canary procedure"}
+    with pytest.raises(ValidationError, match="controlled-vocabulary"):
+        Lesson.model_validate(data)
+
+
+def test_value_outside_vocabulary_is_refused():
+    data = _a1()
+    data["conditions"][4]["target"]["props"]["scope"] = "all depots"
+    with pytest.raises(ValidationError, match="not in the vocabulary"):
+        Lesson.model_validate(data)
+
+
+def test_other_start_on_an_absence_is_refused():
+    data = load_lesson_file(Path("data/lessons/antibody-2.json")).model_dump()
+    data["conditions"][2]["start"] = "other:Channel"
+    with pytest.raises(ValidationError, match="other:"):
+        Lesson.model_validate(data)
+
+
+def test_impossible_path_is_refused():
+    data = load_lesson_file(Path("data/lessons/antibody-2.json")).model_dump()
+    data["conditions"][0]["path"] = [["ALERTS_TO", "out"]]          # Plan has no ALERTS_TO
+    with pytest.raises(ValidationError, match="no outgoing ALERTS_TO"):
+        Lesson.model_validate(data)
+
+
+def test_kind_must_fit_the_label():
+    data = _a1()
+    data["conditions"][1]["target"]["props"]["kind"] = "canary"      # a Step kind, not a Procedure kind
+    with pytest.raises(ValidationError, match="vocabulary for Procedure"):
+        Lesson.model_validate(data)

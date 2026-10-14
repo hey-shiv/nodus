@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, model_validator
 
 from nodus.compiler import compile_condition
 from nodus.db import read
+from nodus.schema import ENDS, KIND_BY_LABEL, VOCAB
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_CACHE = ROOT / "cache" / "sources"
@@ -66,6 +67,27 @@ class Lesson(BaseModel):
             raise ValueError("completion must name one of the conditions")
         if not any(c.kind == "absent" for c in self.conditions):
             raise ValueError("a lesson needs at least one absence condition")
+        role_label = {}
+        for c in self.conditions:
+            label = _walk(c, role_label)            # type-checks the path; label at the far end
+            on_start = _start_label(c, role_label)
+            checks = [(label, (c.target or {}).get("props", {})), (label, c.all_targets or {})]
+            if c.kind == "attribute_equals":
+                checks.append((on_start, {c.property: c.value}))
+            for lbl, filters in checks:
+                for prop, value in filters.items():
+                    if prop not in VOCAB:
+                        raise ValueError(f"{c.id} filters on {prop!r}: only controlled-vocabulary "
+                                         f"properties are allowed ({sorted(VOCAB)})")
+                    allowed = KIND_BY_LABEL.get(lbl, VOCAB[prop]) if prop == "kind" else VOCAB[prop]
+                    if value not in allowed:
+                        raise ValueError(f"{c.id}: {prop}={value!r} is not in the vocabulary for "
+                                         f"{lbl or 'this node'} {sorted(map(str, allowed))}")
+            if c.bind:
+                role_label[c.bind] = label
+            if c.start.startswith("other:") and not (c.kind == "present" and c.bind):
+                raise ValueError(f"{c.id}: an 'other:' start only works for a 'present' condition "
+                                 f"that binds a role; anything else isn't tied to the plan")
         bound = set()
         for c in self.conditions:
             needed = []
@@ -86,6 +108,33 @@ class Lesson(BaseModel):
 
     def digest(self):
         return hashlib.sha256(self.model_dump_json().encode()).hexdigest()[:12]
+
+
+def _start_label(c, role_label):
+    if c.start == "anchor":
+        return "Plan"
+    if c.start.startswith("other:"):
+        return c.start[6:]
+    return role_label.get(c.start[5:])
+
+
+def _walk(c, role_label):
+    """Follow the path through ENDS; refuse a hop that can't exist. Returns the far-end label."""
+    current = _start_label(c, role_label)
+    for rel, direction in c.path or []:
+        if rel not in ENDS:
+            return None                             # unknown names are refused by the compiler
+        src, dst = ENDS[rel]
+        here, there = (src, dst) if direction == "out" else (dst, src)
+        if current and here and current != here:
+            raise ValueError(f"{c.id}: {current} has no {direction}going {rel} relationship "
+                             f"({rel} goes from {src or 'any'} to {dst or 'any'})")
+        current = there
+    target = c.target or {}
+    wanted = target.get("label") or role_label.get(target.get("role"))
+    if c.path and current and wanted and current != wanted:
+        raise ValueError(f"{c.id}: the path ends at {current}, but the target is {wanted}")
+    return wanted or current if c.path else _start_label(c, role_label)
 
 
 def normalise(text):

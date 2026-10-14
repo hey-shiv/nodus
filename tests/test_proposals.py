@@ -96,3 +96,8 @@ def test_cache_never_serves_one_providers_reply_for_another(tmp_path):
     cloud = Named("gemini", '{"from": "cloud"}')
     assert LLM(providers=[cloud], cache_dir=tmp_path).complete_json("same prompt") == '{"from": "cloud"}'
     assert cloud.calls == 1
+
+
+def test_prompt_explains_the_completion_step():
+    from nodus.proposals import build_prompt
+    assert "final ACTION that turns the risk into the failure" in build_prompt("d", "t", "x")
