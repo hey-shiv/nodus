@@ -783,7 +783,7 @@ Witnesses are never scored or shown as "who was right".
 | How it works | The method and the honest limits, in plain words. |
 Supporting modules: `nodus/plans.py` (plan reads and edits), `nodus/view.py` (match → display rows),
 `nodus/svg.py` (the pure drawing function), `app_pages/common.py` (cached connection, error guard, CSS).
-**No page file contains Cypher** (checked with grep). 92 tests green.
+**No page file contains Cypher** (checked with grep). 86 tests green.
 
 **Clicked through in the browser (G4):** reset → Plans shows the hero "one step away" on all
 three lessons → added "rollout to every target" and saved → all three became **full** → Inbox
