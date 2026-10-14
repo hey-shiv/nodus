@@ -214,7 +214,7 @@ Redis protocol), streamlit 1.66.0, pytest 9.1.1, pydantic 2.14.1, python-dotenv 
 
 ---
 
-## Step 7: First commit (local)
+## Step 7: First commit (local) (02:59)
 
 **What:** first commit of the skeleton, the diary and `requirements.txt`. Not pushed
 yet: creating the public GitHub repo is an outward action that needs my OK.
@@ -225,7 +225,7 @@ Pushed to the public repo https://github.com/hey-shiv/nodus (03:02).
 
 ---
 
-## Step 8: T05, FalkorDB up, pinned and persistent (03:10)
+## Step 8: T05, FalkorDB up, pinned and persistent (03:01)
 
 **What:**
 1. Checked Docker Hub: `6.0.2` is still the newest stable FalkorDB tag (`latest` has the
@@ -276,7 +276,7 @@ snapshot; on start it loads it back. The volume is what kept `dump.rdb` between 
 
 ---
 
-## Step 9: T06, the tiny-graph lab (03:25)
+## Step 9: T06, the tiny-graph lab (03:03)
 
 **What:** wrote `tests/test_lab.py`, 12 small pytest tests that each check *one*
 FalkorDB behaviour NODUS will depend on, on a 2–5 node toy graph. A pytest **fixture**
@@ -325,7 +325,7 @@ approves it" stays one person across conditions.
 
 ---
 
-## Step 10: T07, graph model v1 (03:45)
+## Step 10: T07, graph model v1 (03:08)
 
 **What:** designed the graph model in `docs/graph-model.md` (decision: ADR-004).
 1. Listed every condition of the Lite-path lessons: Antibody 1 (5 conditions), Antibody 2
@@ -383,7 +383,7 @@ step to all servers. That missing step is the completion condition, so NODUS can
 
 ---
 
-## Step 11: T08, condition kinds and the compiler design (04:00)
+## Step 11: T08, condition kinds and the compiler design (03:11)
 
 **What:** designed how a lesson becomes runnable queries, in `docs/condition-kinds.md` (ADR-005):
 - five **condition kinds**: `present`, `absent`, `attribute_equals`, `count_equals`, `time_order`;
@@ -426,7 +426,7 @@ be of primitive types or arrays of primitive types"), but arrays work. So a cond
 
 ---
 
-## Step 12: T09, the matching prototype, test-first (04:30) → G1
+## Step 12: T09, the matching prototype, test-first (03:15) → G1
 
 **What:** built the heart of NODUS, three small modules, each with one job:
 
@@ -484,7 +484,7 @@ the results. Each call is a smaller version of the same problem, ending when the
 
 ---
 
-## Step 13: T10, day-1 review (Oct 15, 05:00)
+## Step 13: T10, day-1 review (03:20)
 
 **What:** G1 marked passed (`docs/g1-lab.md`). Confirmed the **Lite path** (ADR-006).
 Decided the LLM's role (ADR-007): optional, used only for lesson *drafts*; all wording
@@ -509,7 +509,7 @@ doesn't support, and a heads-up that overstates is worse than none.
 
 ---
 
-## Step 14: T11, the synthetic world (05:20)
+## Step 14: T11, the synthetic world (03:23)
 
 **What:** invented a fictional company, **Tern & Tally Freight** (`docs/world-story.md`),
 and wrote `nodus/world.py`, which generates it as plain data: 86 nodes and 145
@@ -551,7 +551,7 @@ and a judge running the project gets the identical world.
 
 ---
 
-## Step 15: T12, the loader (05:30) → G2
+## Step 15: T12, the loader (03:26) → G2
 
 **What:** `nodus/db.py` (one place that knows how to connect) and `nodus/loader.py`:
 nodes are grouped by label and written with `UNWIND $rows … MERGE (n:Label {id: row.id})
@@ -578,3 +578,126 @@ G2 passed.
 - **How to spot it next time:** "empty key" means the graph hasn't been created yet.
 
 **Q&A:** none.
+
+**Correction (03:37):** the times on steps 7–15 were first written as estimates and ran
+ahead of the clock. They've been corrected to the real git commit times. From here on,
+every time is read from the clock.
+
+---
+
+## Step 16: T13, the internal post-mortems (03:30)
+
+**What:** wrote two synthetic post-mortems in `data/postmortems/`: E1 (label printer
+firmware push, the source of the internal lesson) and E2 (invoice export review, a
+near-incident where the concern was *accepted*). Both are blameless and marked synthetic.
+Each sentence the internal lesson needs is written as a plain, explicit sentence.
+
+**Why:** a lesson condition is only as trustworthy as the sentence it cites. "Nobody was
+watching the printer-alerts email list" can be checked; "communication issues" can't.
+
+**First principles: blameless wording.**
+A post-mortem that blames people makes them hide information next time. Blameless
+format describes systems and decisions ("the request was declined to keep the release on
+schedule"), not fault ("X ignored Y"). It matters doubly for NODUS: the witness feature
+invites the person who raised a concern, which must read as *asking for advice*, never as
+"who was right". So the concern is recorded as a fact, with no verdict.
+
+---
+
+## Step 17: T16 (first), primary-source quotes for the antibodies (03:30)
+
+**What:** for each public incident I downloaded the organisation's own published page
+(Cloudflare's post-mortem, CrowdStrike's review hub, the SEC press release on Knight
+Capital, GitLab's post-mortem) and checked every quote **character for character**
+against the page text. 19/19 quotes across the three lessons are verified.
+`scripts/verify_sources.py` repeats this check for anyone. The page texts are cached
+locally in `cache/sources/` (gitignored: NODUS cites these pages, it doesn't redistribute them).
+
+**Why:** the antibodies name real companies. One misquote and the whole project's
+credibility goes. A summary tool also *paraphrases*: the first pass used a web tool
+that summarises pages, so its "quotes" couldn't be trusted until checked against the raw text.
+
+**Findings while verifying:**
+- CrowdStrike's review doesn't say the update went "to every host at once" (that was a
+  secondary-source claim in my plan). It says the update was published to Windows hosts
+  running sensor 7.11+, and the fix is a *staggered deployment starting with a canary*. So
+  the CrowdStrike citation on A1.3 is marked as "remediation step; implies no staggered
+  deployment before", and A1.5 ("goes to every target at once") cites only Cloudflare's
+  "went global in seconds".
+- The Knight "97 automated emails" fact is in the SEC press release itself (not only in secondary summaries).
+
+**Decision: `cache/` is gitignored** (closes the open question from step 2): fetched
+pages are cited, not redistributed, and LLM replies are a local convenience.
+
+---
+
+## Step 18: T14 + T16, lessons as validated data (03:33)
+
+**What:**
+- `data/lessons/`: three hand-authored lessons as JSON: Antibody 1 (Cloudflare 2019 +
+  CrowdStrike 2024), Antibody 2 (Knight 2012 + GitLab 2017), internal "The quiet push" (E1).
+  Each condition has a kind, a spec, plain text and at least one verbatim citation.
+- `nodus/lessons.py`: pydantic models; three checks a lesson must pass (shape, compiles
+  against the whitelist, quotes verbatim); storage in FalkorDB as `Lesson`, `Condition`,
+  `CITES {quote}`, `LEARNED_FROM`; `approve()`, with versioning (an edit creates a new
+  version that needs approval again); `active_lessons()` reads approved lessons back from the graph.
+- `nodus/llm.py`: one call that returns JSON. It tries Gemini (if a key is in `.env`), then
+  the local Gemma model, and caches every reply on disk.
+- `nodus/proposals.py`: the LLM drafts a lesson from a post-mortem; the draft is retried
+  with the problems listed, up to 2 times, then quarantined. Even an accepted draft is only *proposed*.
+- Tests: 11 for lessons, 6 for proposals (fake LLM, no real calls).
+
+**Why the LLM is boxed in like this:** it's good at reading a post-mortem and suggesting
+a shape, and bad at being exactly right. So it never writes queries (the compiler does),
+can't invent evidence (the verbatim check rejects it), and can't activate anything (only
+`approve()` does, and only a human calls it).
+
+**First principles: pydantic.**
+You describe the data's shape as a Python class (`kind` must be one of four strings,
+`conditions` must have 3–6 items...). `Lesson.model_validate(data)` either returns a typed
+object or raises an error that lists what's wrong. It's a gate at the boundary: anything past
+it has the right shape.
+
+**First principles: a fallback chain.**
+Try the best option; if it fails (quota, offline), try the next. The caller asks once and
+doesn't care which provider answered. The cache sits in front: the same prompt never costs twice.
+
+**Problem and fix:**
+- **Symptom:** "Invalid graph operation on empty key" when storing the first lesson.
+- **Cause:** the same FalkorDB behaviour as in step 15: reads fail on a graph that was never written.
+- **Fix:** one helper, `nodus.db.read()`, treats that error as "no rows". Lessons and the matcher use it.
+
+---
+
+## Step 19: T17, matching the whole world (03:35) → G3
+
+**What:** `nodus/watch.py` runs every approved lesson over every current plan:
+- stage 1 (cheap): skip lessons whose anchor relationships the plan doesn't have at all;
+- stage 2 (careful): the anchor-first evaluator.
+An echo is **raised** when k ≥ n − 1. `scripts/setup_demo.py` rebuilds the demo graph
+(world + lessons). `tests/test_g3.py` turns the designed expectations into 7 tests, all
+green on the first run. The results table is in `docs/g3-results.md`. 55/55 tests pass.
+
+| Plan | Result |
+|---|---|
+| hero | **foresight** on all three lessons: 4/5, 3/4, 4/5, missing only each completion step |
+| maps (internal echo) | **full** on the internal lesson, and on Antibody 2 (its alerts also go nowhere) |
+| sensor (control) | nothing raised (2/5, 2/4, 3/5), despite sharing CrowdStrike's words |
+| scanner (near-miss) | 3/5, not raised |
+| billing (clean) | nothing raised |
+
+**Why the control stays quiet:** it *says* "global rollout", "content update", "validator",
+"channel file". But structurally it follows the canary procedure (A1.3 fails), has a human
+review (A1.4 fails) and pages a watched on-call (A2.2 and A2.3 fail). NODUS never reads the
+words; it checks the relationships.
+
+**First principles: why the maps plan matched Antibody 2 too.**
+I designed it as the "internal echo", but its alerts go to an unwatched email list and it
+goes live, which is exactly Knight's and GitLab's shape. I didn't hide that: one plan can
+echo several lessons, and here the extra echo is correct.
+
+**Q&A:** none.
+
+**Open:**
+- Gemma 4 download still running; Gemini needs a key in `.env` (optional).
+- The CrowdStrike/A1.3 citation is an inference from a remediation step: say so on the Echo page.

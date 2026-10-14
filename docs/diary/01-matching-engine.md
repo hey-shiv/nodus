@@ -55,7 +55,7 @@ plan meets (k of n), with consistent role bindings, and name the completion step
 - **Predicted:** *before running, write: how many tests, pass or fail, and the hero's k/n.*
 - **Actual:** *paste the last lines.*
 - **Match:** *yes/no; if no, what it taught you.*
-- (Claude's own run, Oct 15 04:30: 12 passed; 24 with the lab tests.)
+- (Claude's own run, Oct 15 03:15: 12 passed; 24 with the lab tests.)
 
 ## Plain-English summary
 NODUS checks a plan against a lesson one condition at a time, inside the graph database,

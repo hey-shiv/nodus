@@ -99,7 +99,7 @@ relationships (routine change, bypassed staged procedure, alerts to an unwatched
 channel, rollout to all). So the hero plan can echo **two public antibodies and one
 internal lesson** at once, as in the plan's Part 0. No new kinds are needed.
 
-**Verified (scratch run, Oct 15 ~03:45):** on a tiny hero graph every sketch ran and
+**Verified (scratch run, Oct 15, 03:07):** on a tiny hero graph every sketch ran and
 gave the expected answer. Antibody 1: A1.1–A1.4 true, A1.5 (completion) false → **4 of 5**.
 Antibody 2: A2.1–A2.3 true, A2.4 false → **3 of 4**.
 

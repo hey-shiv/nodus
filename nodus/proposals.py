@@ -1,0 +1,79 @@
+"""Ask the LLM to draft a lesson from a post-mortem, then check its homework.
+
+A draft is accepted only if it validates (shape), compiles (whitelisted names) and
+every quote is found verbatim in the post-mortem. Otherwise it is retried with the
+problems listed, and finally quarantined. Accepted drafts are still only *proposed*:
+a human approves them (nodus.lessons.approve).
+"""
+import json
+from pathlib import Path
+
+from pydantic import ValidationError
+
+from nodus.compiler import CompileError
+from nodus.lessons import Lesson, check_compiles, unverified_quotes
+from nodus.schema import LABELS, PROPERTIES, RELATIONSHIPS
+
+QUARANTINE = Path(__file__).resolve().parent.parent / "cache" / "quarantine"
+
+
+class ProposalRejected(ValueError):
+    pass
+
+
+def build_prompt(doc_id, doc_text, lesson_id):
+    return f"""You draft a reusable lesson from an incident post-mortem, as JSON only.
+
+A lesson is 3 to 6 conditions describing the SHAPE of the failure with roles and
+relationships, not names or blame. Each condition has one kind:
+- "present": a path from a start node to a target exists. Fields: start, path, target, optional bind.
+- "absent": no such path exists (something missing). Same fields.
+- "attribute_equals": a property of the start node equals a value. Fields: start, property, value.
+- "count_equals": exactly n paths exist, optionally all targets match. Fields: start, path, target, n, all_targets.
+start is "anchor" (the plan being checked), "role:<name>" (bound earlier by bind) or "other:<Label>".
+path is a list of [RELATIONSHIP, "out"|"in"] with 1 or 2 hops.
+target is {{"label": L, "props": {{...}}}} or {{"role": name}}.
+Allowed labels: {sorted(LABELS)}
+Allowed relationships: {sorted(RELATIONSHIPS)}
+Allowed properties: {sorted(PROPERTIES)}
+Rules: at least one "absent" condition; "completion" names the final step that completes
+the failure; every condition has "citations": [{{"doc": "{doc_id}", "quote": "<a sentence copied
+EXACTLY from the post-mortem>"}}]. Never invent or paraphrase a quote.
+
+Output JSON with keys: id ("{lesson_id}"), name, origin ("synthetic"), summary, safe_pattern,
+learned_from (list), completion, conditions (each with id, text, kind, the kind's fields, citations).
+
+POST-MORTEM ({doc_id}):
+{doc_text}
+"""
+
+
+def _problems(reply, sources):
+    try:
+        lesson = Lesson.model_validate(json.loads(reply))
+    except (json.JSONDecodeError, ValidationError) as e:
+        return None, [f"invalid shape: {str(e)[:300]}"]
+    try:
+        check_compiles(lesson)
+    except (CompileError, KeyError) as e:
+        return None, [f"does not compile: {e}"]
+    bad = unverified_quotes(lesson, sources)
+    return lesson, [f"{c}: {problem} ({doc})" for c, doc, problem in bad]
+
+
+def propose_lesson(llm, doc_id, doc_text, sources, lesson_id, retries=2):
+    prompt = build_prompt(doc_id, doc_text, lesson_id)
+    replies = []
+    for _ in range(retries + 1):
+        reply = llm.complete_json(prompt)
+        replies.append(reply)
+        lesson, problems = _problems(reply, sources)
+        if not problems:
+            return lesson
+        prompt = (build_prompt(doc_id, doc_text, lesson_id)
+                  + "\nYOUR PREVIOUS DRAFT WAS REJECTED:\n- " + "\n- ".join(problems)
+                  + "\nFix every problem. Copy quotes exactly.\n")
+    QUARANTINE.mkdir(parents=True, exist_ok=True)
+    (QUARANTINE / f"{lesson_id}.json").write_text(json.dumps(
+        {"doc": doc_id, "replies": replies, "problems": problems}, indent=2))
+    raise ProposalRejected(f"{lesson_id}: rejected after {retries + 1} drafts: {problems}")

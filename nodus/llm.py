@@ -1,0 +1,91 @@
+"""A provider-neutral LLM call that returns JSON, with a disk cache and a fallback chain.
+
+Order: Gemini (if GEMINI_API_KEY is set) -> local Ollama model (if running) -> error.
+When Gemini's quota runs out, the call falls through to the local model.
+The LLM only drafts lesson proposals; it never decides a match or approves anything.
+"""
+import hashlib
+import json
+import os
+import urllib.request
+from pathlib import Path
+
+CACHE = Path(__file__).resolve().parent.parent / "cache" / "llm"
+GEMINI_MODEL = os.environ.get("NODUS_GEMINI_MODEL", "gemini-2.5-flash")
+OLLAMA_MODEL = os.environ.get("NODUS_OLLAMA_MODEL", "gemma4:12b-it-qat")
+OLLAMA_URL = os.environ.get("NODUS_OLLAMA_URL", "http://localhost:11434")
+
+
+class LLMError(RuntimeError):
+    pass
+
+
+class Gemini:
+    name = "gemini"
+
+    def __init__(self, key, model=GEMINI_MODEL):
+        from google import genai
+        self.client, self.model = genai.Client(api_key=key), model
+
+    def complete(self, prompt):
+        try:
+            resp = self.client.models.generate_content(
+                model=self.model, contents=prompt,
+                config={"response_mime_type": "application/json", "temperature": 0})
+        except Exception as e:          # quota, network, auth: let the next provider try
+            raise LLMError(f"gemini: {e}") from e
+        return resp.text
+
+
+class Ollama:
+    name = "ollama"
+
+    def __init__(self, model=OLLAMA_MODEL, url=OLLAMA_URL):
+        self.model, self.url = model, url
+
+    def complete(self, prompt):
+        body = json.dumps({"model": self.model, "stream": False, "format": "json",
+                           "options": {"temperature": 0},
+                           "messages": [{"role": "user", "content": prompt}]}).encode()
+        req = urllib.request.Request(f"{self.url}/api/chat", data=body,
+                                     headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=600) as r:
+                return json.loads(r.read())["message"]["content"]
+        except Exception as e:
+            raise LLMError(f"ollama: {e}") from e
+
+
+def default_providers():
+    from dotenv import load_dotenv
+    load_dotenv()
+    providers = []
+    if os.environ.get("GEMINI_API_KEY"):
+        providers.append(Gemini(os.environ["GEMINI_API_KEY"]))
+    providers.append(Ollama())
+    return providers
+
+
+class LLM:
+    """Try each provider in order; cache every successful reply on disk."""
+
+    def __init__(self, providers=None, cache_dir=CACHE):
+        self.providers = providers if providers is not None else default_providers()
+        self.cache_dir = Path(cache_dir)
+
+    def complete_json(self, prompt):
+        key = hashlib.sha256(prompt.encode()).hexdigest()[:20]
+        cached = self.cache_dir / f"{key}.json"
+        if cached.exists():
+            return json.loads(cached.read_text())["reply"]
+        errors = []
+        for p in self.providers:
+            try:
+                reply = p.complete(prompt)
+            except LLMError as e:
+                errors.append(str(e))
+                continue
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            cached.write_text(json.dumps({"provider": p.name, "reply": reply}))
+            return reply
+        raise LLMError("no provider answered: " + " | ".join(errors))

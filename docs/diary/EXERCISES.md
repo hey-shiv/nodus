@@ -202,3 +202,30 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>MERGE on a whole pattern creates every missing part, including new endpoint nodes. Matching first means the relationship attaches only to existing nodes.</details>
 
 **Self-check:**
+
+---
+
+## Steps 16–19: Post-mortems, sources, lessons, G3
+
+**E47.** Why must every condition cite a sentence found *verbatim*, and why wasn't the web tool's output trusted?
+<details><summary>Key</summary>The antibodies name real companies; a misquote destroys credibility. The tool summarises pages with a small model, so its "quotes" can be paraphrased. Only a character-level check against the raw page proves a quote.</details>
+
+**E48.** What three checks must a lesson pass before it can be stored? What's the fourth step before it's used?
+<details><summary>Key</summary>Shape (pydantic), compiles (whitelisted names, roles bound before use), quotes verbatim. Then a human approval; only approved lessons are matched.</details>
+
+**E49.** List three things the LLM is NOT allowed to do in NODUS.
+<details><summary>Key</summary>Write the queries that run; decide a match or severity; approve or activate a lesson. (Also: invent evidence, which is caught by the verbatim check.)</details>
+
+**E50.** Prediction: you edit the summary of an approved lesson and store it again. What happens to its version, its status and the matches?
+<details><summary>Key</summary>Version goes up by 1, status goes back to "proposed", and the lesson stops matching until it's approved again (active_lessons returns only approved ones).</details>
+
+**E51.** Why does the control plan raise nothing even though it shares 5+ key terms with the CrowdStrike text?
+<details><summary>Key</summary>NODUS checks relationships, not words: the control follows the canary procedure (A1.3 fails), has a human gate (A1.4 fails) and pages a watched on-call (A2.2, A2.3 fail).</details>
+
+**E52.** What's the honest limit of the CrowdStrike citation on A1.3?
+<details><summary>Key</summary>The review doesn't say outright "no staged rollout"; it lists a staggered/canary deployment as a fix, which implies there wasn't one. The citation is marked as an inference from a remediation step.</details>
+
+**E53.** Prediction: Gemini's quota runs out mid-proposal. What does `LLM.complete_json` do?
+<details><summary>Key</summary>Gemini raises LLMError, so the next provider (local Gemma via Ollama) is tried. If that answers, its reply is cached and returned; if not, an LLMError lists both failures.</details>
+
+**Self-check:**

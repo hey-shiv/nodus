@@ -1,0 +1,30 @@
+{
+  "id": "internal-quiet-push",
+  "name": "The quiet push",
+  "origin": "synthetic",
+  "summary": "A change skips the canary procedure that most changes follow, its alerts go to a channel nobody watches, and it is sent to every depot at once.",
+  "safe_pattern": "Canary batch first, and route the system's alerts to a watched channel with an owner.",
+  "learned_from": ["ep-e1"],
+  "completion": "Q.5",
+  "conditions": [
+    {"id": "Q.1", "text": "Other changes follow a staged procedure",
+     "kind": "present", "start": "other:Plan", "path": [["FOLLOWS", "out"]],
+     "target": {"label": "Procedure", "props": {"kind": "staged_rollout"}}, "bind": "proc",
+     "citations": [{"doc": "doc-pm-e1", "quote": "Most changes at Tern & Tally go through the canary procedure: a small batch of depots first, then everyone."}]},
+    {"id": "Q.2", "text": "This change does not follow it",
+     "kind": "absent", "start": "anchor", "path": [["FOLLOWS", "out"]], "target": {"role": "proc"},
+     "citations": [{"doc": "doc-pm-e1", "quote": "This change did not follow the canary procedure."}]},
+    {"id": "Q.3", "text": "The system's alerts go to a channel",
+     "kind": "present", "start": "anchor", "path": [["TARGETS", "out"], ["ALERTS_TO", "out"]],
+     "target": {"label": "Channel"}, "bind": "ch",
+     "citations": [{"doc": "doc-pm-e1", "quote": "The printer error alerts went to the printer-alerts email list."}]},
+    {"id": "Q.4", "text": "Nobody active is watching that channel",
+     "kind": "absent", "start": "role:ch", "path": [["WATCHES", "in"]],
+     "target": {"label": "Person", "props": {"active": true}},
+     "citations": [{"doc": "doc-pm-e1", "quote": "Nobody was watching the printer-alerts email list, so the alerts went unread for more than three hours."}]},
+    {"id": "Q.5", "text": "The change goes to every depot at once",
+     "kind": "present", "start": "anchor", "path": [["HAS_STEP", "out"]],
+     "target": {"label": "Step", "props": {"kind": "rollout", "scope": "all"}},
+     "citations": [{"doc": "doc-pm-e1", "quote": "The firmware was sent to every depot at once, so every depot failed together."}]}
+  ]
+}

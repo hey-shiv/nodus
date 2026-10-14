@@ -14,4 +14,9 @@ __pycache__/
 # macOS folder metadata
 .DS_Store
 
-# OPEN DECISION: whether cache/ (saved LLM replies) is committed. Decided at D13.
+# Local caches: fetched public post-mortem texts (we cite, never redistribute them)
+# and saved LLM replies. Rebuilt by scripts/verify_sources.py and nodus/llm.py.
+cache/
+
+# Local model / app artefacts
+.streamlit/secrets.toml

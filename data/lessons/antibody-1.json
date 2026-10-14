@@ -1,0 +1,36 @@
+{
+  "id": "antibody-1",
+  "name": "The trusted change, everywhere at once",
+  "origin": "public",
+  "summary": "A change judged safe because of its category or track record skips the staged rollout other changes use, passes a single automated check, and reaches everything at the same moment.",
+  "safe_pattern": "Send even routine changes through the staged procedure: a small batch first, a human look, then everyone.",
+  "learned_from": ["doc-cloudflare-2019", "doc-crowdstrike-2024"],
+  "completion": "A1.5",
+  "conditions": [
+    {"id": "A1.1", "text": "The change is treated as routine or already trusted",
+     "kind": "attribute_equals", "start": "anchor", "property": "risk_class", "value": "routine",
+     "citations": [
+       {"doc": "doc-cloudflare-2019", "quote": "The SOP allowed a non-emergency rule change to go globally into production without a staged rollout."},
+       {"doc": "doc-crowdstrike-2024", "quote": "trust in the checks performed in the Content Validator, and previous successful IPC Template Instance deployments, these instances were deployed into production."}]},
+    {"id": "A1.2", "text": "A staged rollout procedure exists and other changes follow it",
+     "kind": "present", "start": "other:Plan", "path": [["FOLLOWS", "out"]],
+     "target": {"label": "Procedure", "props": {"kind": "staged_rollout"}}, "bind": "proc",
+     "citations": [
+       {"doc": "doc-cloudflare-2019", "quote": "Changing the SOP to do staged rollouts of rules in the same manner used for other software at Cloudflare"}]},
+    {"id": "A1.3", "text": "This change does not follow the staged procedure",
+     "kind": "absent", "start": "anchor", "path": [["FOLLOWS", "out"]], "target": {"role": "proc"},
+     "citations": [
+       {"doc": "doc-cloudflare-2019", "quote": "The SOP allowed a non-emergency rule change to go globally into production without a staged rollout."},
+       {"doc": "doc-crowdstrike-2024", "quote": "Implement a staggered deployment strategy for Rapid Response Content in which updates are gradually deployed to larger portions of the sensor base, starting with a canary deployment.", "note": "remediation step; implies no staggered deployment before"}]},
+    {"id": "A1.4", "text": "A single automated check is the only gate",
+     "kind": "count_equals", "start": "anchor", "path": [["GATED_BY", "out"]],
+     "target": {"label": "Check"}, "n": 1, "all_targets": {"kind": "automated"},
+     "citations": [
+       {"doc": "doc-crowdstrike-2024", "quote": "Due to a bug in the Content Validator, one of the two Template Instances passed validation despite containing problematic content data."}]},
+    {"id": "A1.5", "text": "The change goes to every target at once",
+     "kind": "present", "start": "anchor", "path": [["HAS_STEP", "out"]],
+     "target": {"label": "Step", "props": {"kind": "rollout", "scope": "all"}},
+     "citations": [
+       {"doc": "doc-cloudflare-2019", "quote": "that speed meant that a change to the rules went global in seconds"}]}
+  ]
+}

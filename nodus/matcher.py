@@ -6,6 +6,7 @@ module only orders the conditions, passes bound role ids along, and counts k of 
 from dataclasses import dataclass, field
 
 from nodus.compiler import compile_condition
+from nodus.db import read
 
 
 @dataclass
@@ -82,8 +83,9 @@ def _status(k, n, missing, completion):
 def evaluate(graph, anchor, lesson):
     # Some conditions are facts about the company, not the plan (A1.2), so they would
     # hold even for a plan that doesn't exist. Check the anchor first.
-    found = graph.ro_query("MATCH (p:Plan) WHERE p.id = $anchor RETURN count(p)",
-                           {"anchor": anchor}).result_set[0][0]
+    found = read(graph, "MATCH (p:Plan) WHERE p.id = $anchor RETURN count(p)",
+                 {"anchor": anchor})
+    found = found[0][0] if found else 0
     if found:
         conditions, bindings = _run(graph, lesson["conditions"], anchor, {})
     else:

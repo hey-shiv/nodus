@@ -1,6 +1,6 @@
 # G1 lab evidence
 
-## T05: FalkorDB up, pinned, persistent (Oct 15, 2026, ~03:10 IST)
+## T05: FalkorDB up, pinned, persistent (Oct 15, 2026, 03:01 IST)
 
 | Item | Value |
 |---|---|
@@ -26,7 +26,7 @@
 - **Default query timeout is 1000 ms** (`FALKORDB_ARGS=... TIMEOUT 1000`). Any matching
   query slower than 1 s fails. Keep queries bounded; it's also a useful guard against runaway patterns.
 
-## T06: Tiny-graph lab (Oct 15, 2026, ~03:25 IST)
+## T06: Tiny-graph lab (Oct 15, 2026, 03:03 IST)
 
 `tests/test_lab.py`: 12 tests, each on a throwaway graph `lab_<random>` (fixture in
 `tests/conftest.py`). **All 12 pass** on FalkorDB 6.0.2 with client 1.8.0.
@@ -123,7 +123,7 @@ Distinct
 ```
 
 
-## T09: Matching prototype (Oct 15, 2026, ~04:30 IST)
+## T09: Matching prototype (Oct 15, 2026, 03:15 IST)
 
 Modules: `nodus/schema.py` (whitelist), `nodus/compiler.py` (one template per kind),
 `nodus/matcher.py` (anchor-first evaluator). Tests: `tests/test_matching.py`, **12 tests,

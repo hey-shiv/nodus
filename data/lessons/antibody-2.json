@@ -1,0 +1,33 @@
+{
+  "id": "antibody-2",
+  "name": "The warning that went nowhere",
+  "origin": "public",
+  "summary": "Automated warnings exist, but they are delivered to a channel nobody treats as an alert route, and nobody is watching it, so the failure is discovered during the disaster.",
+  "safe_pattern": "Route every warning a change can raise to a channel with an active owner who is watching, before the change goes live.",
+  "learned_from": ["doc-knight-2012", "doc-gitlab-2017"],
+  "completion": "A2.4",
+  "conditions": [
+    {"id": "A2.1", "text": "The changed system sends automated warnings to a channel",
+     "kind": "present", "start": "anchor", "path": [["TARGETS", "out"], ["ALERTS_TO", "out"]],
+     "target": {"label": "Channel"}, "bind": "ch",
+     "citations": [
+       {"doc": "doc-knight-2012", "quote": "an internal Knight Capital system generated 97 automated emails that went to a group of personnel."},
+       {"doc": "doc-gitlab-2017", "quote": "While notifications are enabled for any cronjobs that error, these notifications are sent by email."}]},
+    {"id": "A2.2", "text": "That channel is an email list, not an alert route",
+     "kind": "attribute_equals", "start": "role:ch", "property": "kind", "value": "email_list",
+     "citations": [
+       {"doc": "doc-gitlab-2017", "quote": "While notifications are enabled for any cronjobs that error, these notifications are sent by email."},
+       {"doc": "doc-knight-2012", "quote": "an internal Knight Capital system generated 97 automated emails that went to a group of personnel."}]},
+    {"id": "A2.3", "text": "Nobody active is watching that channel",
+     "kind": "absent", "start": "role:ch", "path": [["WATCHES", "in"]],
+     "target": {"label": "Person", "props": {"active": true}},
+     "citations": [
+       {"doc": "doc-knight-2012", "quote": "These messages were caused by the code deployment failure, but Knight Capital did not act upon them on August 1."},
+       {"doc": "doc-gitlab-2017", "quote": "This means we were never aware of the backups failing, until it was too late."}]},
+    {"id": "A2.4", "text": "The change goes live",
+     "kind": "present", "start": "anchor", "path": [["HAS_STEP", "out"]],
+     "target": {"label": "Step", "props": {"kind": "rollout"}},
+     "citations": [
+       {"doc": "doc-knight-2012", "quote": "Knight Capital incorrectly deployed new code in the same router."}]}
+  ]
+}
