@@ -1,0 +1,17 @@
+# Written first, before any other file, so nothing secret or generated
+# can ever slip into a commit. (Plan T03; reasons in docs/diary/LOG.md, step 2.)
+
+# Python virtual environment: rebuilt from requirements.txt, never committed
+.venv/
+
+# Secrets (API keys). Never committed. An .env.example will list the names only.
+.env
+
+# Python and pytest generated files
+__pycache__/
+.pytest_cache/
+
+# macOS folder metadata
+.DS_Store
+
+# OPEN DECISION: whether cache/ (saved LLM replies) is committed. Decided at D13.
