@@ -358,3 +358,24 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>Its "nobody watches" condition counted any watcher, including an inactive one (Ravi left). That's a judgement error, not a type error, so it's the human reviewer's job at approval.</details>
 
 **Self-check:**
+
+---
+
+## Step 30: Antibody 3 and the melody
+
+**E83.** Write Antibody 3's four conditions in plain words. Which one is the silence, and which is the completion?
+<details><summary>Key</summary>(1) the change acts on a core system; (2) a recovery/status tool depends on that system; (3) ∅ no fallback is recorded for that tool (the silence); (4) the change hits everything at once (the completion).</details>
+
+**E84.** Why does the billing plan stay quiet on Antibody 3 even though its recovery console depends on billing?
+<details><summary>Key</summary>A mirror is recorded as FALLBACK_FOR the console, so the absence A3.3 fails: 2/4, below the warning level.</details>
+
+**E85.** Why was the evaluation pinned to three lessons before adding Antibody 3?
+<details><summary>Key</summary>The declaration named three lessons and its numbers are published. Letting a new lesson into the run would change a pre-declared result after the fact. A new evaluation would need a new declaration first.</details>
+
+**E86.** Prediction: the hero plan adds "rollout to every target". What does the Antibody 1 melody do now?
+<details><summary>Key</summary>The completion condition holds, so the phrase plays to the end: four tension notes (one a ∅ rest), then the tonic. The "Resolved" player is replaced by "resolves on its own".</details>
+
+**E87.** Why is the melody not decoration?
+<details><summary>Key</summary>It's generated only from the match result (which conditions hold, which is the completion step), carries no extra information, has a visual equivalent, and never autoplays.</details>
+
+**Self-check:**

@@ -11,6 +11,7 @@ LABELS = frozenset({
 
 RELATIONSHIPS = frozenset({
     "HAS_STEP", "FOLLOWS", "GATED_BY", "TARGETS", "ALERTS_TO", "WATCHES", "OWNS",
+    "DEPENDS_ON", "FALLBACK_FOR",
     "RAISED", "ABOUT", "AUTHORED", "INVOLVED", "DESCRIBED_IN",
     "HAS_CONDITION", "CITES", "LEARNED_FROM", "OF_LESSON", "ON_PLAN", "INVITED",
 })
@@ -30,7 +31,8 @@ VOCAB = {
     "kind": {"review", "test", "canary", "rollout",                    # Step
              "staged_rollout", "change_review", "backup_restore_test",  # Procedure
              "automated", "human",                                       # Check
-             "pager", "chat_alerts", "email_list"},                      # Channel
+             "pager", "chat_alerts", "email_list",                       # Channel
+             "service", "recovery_tool"},                                # System
     "scope": {"subset", "all"},
     "resolution": {"accepted", "overruled", "open"},
     "active": {True, False},
@@ -40,6 +42,7 @@ VOCAB = {
 ENDS = {
     "HAS_STEP": ("Plan", "Step"), "FOLLOWS": ("Plan", "Procedure"), "GATED_BY": ("Plan", "Check"),
     "TARGETS": ("Plan", "System"), "ALERTS_TO": ("System", "Channel"),
+    "DEPENDS_ON": ("System", "System"), "FALLBACK_FOR": ("System", "System"),
     "WATCHES": ("Person", "Channel"), "OWNS": ("Person", None), "RAISED": ("Person", "Concern"),
     "ABOUT": ("Concern", "Plan"), "AUTHORED": ("Person", "Document"),
     "INVOLVED": ("Episode", "Plan"), "DESCRIBED_IN": ("Episode", "Document"),
@@ -54,4 +57,5 @@ KIND_BY_LABEL = {
     "Procedure": {"staged_rollout", "change_review", "backup_restore_test"},
     "Check": {"automated", "human"},
     "Channel": {"pager", "chat_alerts", "email_list"},
+    "System": {"service", "recovery_tool"},
 }

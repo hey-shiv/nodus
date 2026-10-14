@@ -32,7 +32,7 @@ allows several without penalty.*
 > Companies repeat failures, including ones they already wrote down, because people and search
 > tools look for lessons by what things sound like. NODUS turns lessons from post-mortems (the
 > company's own and famous public ones: Cloudflare 2019, CrowdStrike 2024, Knight Capital 2012,
-> GitLab 2017) into small patterns of roles and relationships, stored in FalkorDB. Every
+> GitLab 2017, AWS S3 2017) into small patterns of roles and relationships, stored in FalkorDB. Every
 > condition quotes the sentence it comes from, checked word for word, and a person approves each
 > lesson.
 >
@@ -41,7 +41,8 @@ allows several without penalty.*
 > lesson's last step hold, NODUS says the plan is one step away and names that step. It also
 > shows what's missing from the record (nobody watching the alerts, no owner), invites the
 > person who raised the concern last time (by their role in the old incident, never by a score),
-> and remembers what the owner did about it, so each lesson builds a track record.
+> and remembers what the owner did about it, so each lesson builds a track record. It also plays
+> the match as an unfinished melody: one note per condition, with the last note held back.
 >
 > In the demo, a plan written in completely different words is one step from three past
 > failures, while a plan that uses CrowdStrike's own vocabulary but is structured safely raises
@@ -102,13 +103,15 @@ Gemini (free tier) or local Gemma 4 via Ollama for lesson drafts; Laya for role 
 | 0:00–0:15 | Plans page title: "1 of 5 plans is one step from a known failure" | "In 2003, the board investigating Columbia wrote a chapter called *History as Cause*. Companies repeat failures they already wrote down, because we search lessons by how they sound." |
 | 0:15–0:35 | Echo page, lesson "The trusted change, everywhere at once"; open **Every condition, with its source sentence** and scroll to the Cloudflare and CrowdStrike quotes | "In 2019 a Cloudflare rule change skipped the staged rollout and went global in seconds. In 2024 a CrowdStrike update passed a single validator and was deployed. Different companies, different words, same shape. Every condition here quotes the published post-mortem." |
 | 0:35–0:55 | Plans page, the hero row "Refresh tariff tables for every depot" with its three shape strips | "This is a plan at a synthetic freight company. It doesn't share a keyword with those post-mortems. NODUS checks structure: who and what is connected." |
-| 0:55–1:35 | **Open echo** on the hero, Antibody 1: the alignment picture | "Four of five conditions hold: routine, skips the canary procedure others follow, one automated check. The fifth, sending it to every depot at once, isn't in the plan yet. That's the step not to take. The violet mark is a silence: nothing recorded where something should be." |
+| 0:55–1:35 | **Open echo** on the hero, Antibody 1: the alignment picture, then **Hear it**: play the first clip, then *Resolved* | "Four of five conditions hold: routine, skips the canary procedure others follow, one automated check. The fifth, sending it to every depot at once, isn't in the plan yet. Listen: four notes, and the fifth is held back. That's the step not to take. Here's what taking it sounds like." |
 | 1:35–2:00 | Echo, lesson "The quiet push" → **Who saw it coming** (Asha Rao) | "NODUS also remembers the company's own history. Last year Asha asked for a canary batch before a firmware push and was overruled. She's still here, so NODUS invites her, by her role in that incident, never by a score." |
 | 2:00–2:25 | Plans → open **Compare with keyword search** | "And a plan that only sounds like a disaster? Keyword search ranks the dock-sensor plan closest to CrowdStrike. NODUS raises nothing, because that plan follows the canary procedure, has a human review and pages a watched on-call." |
 | 2:25–2:45 | Inbox (Lena Brandt) → choose **Change the plan** → **Record my answer**; then Lessons → track record | "The owner records what she'll do. NODUS remembers it, and the lesson's track record updates." |
 | 2:45–3:00 | README section "The Cypher NODUS depends on" (or the repo on GitHub) | "Because a lesson is a graph pattern, FalkorDB is where it lives and where it watches. In a pre-declared test: 18 of 18 echoes found, zero false alarms. Learn from mistakes you never made." |
 
-**Optional extra shot** (if time allows): Plans → Change a plan → Add a step: *rollout*, scope
+**Optional extra shots** (if time allows): Echo for *Shrink the parcel photo archive* with *The tool
+you need depends on the thing that broke* (AWS S3 + Cloudflare): the ops board depends on the archive
+and no fallback is recorded. And: Plans → Change a plan → Add a step: *rollout*, scope
 *every target* → **Save plan**. The banner turns to "full": the step not to take, taken.
 
 ---

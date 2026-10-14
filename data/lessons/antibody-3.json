@@ -1,0 +1,34 @@
+{
+  "id": "antibody-3",
+  "name": "The tool you need depends on the thing that broke",
+  "origin": "public",
+  "summary": "A change acts on a core system that a status, control or recovery tool depends on, with no practised independent route to that tool, and it hits the whole system at once: when it breaks, the tool you need to see or fix it breaks too.",
+  "safe_pattern": "Give status, control and recovery tools an independent, practised fallback that doesn't depend on the systems they help recover, before changing those systems.",
+  "learned_from": ["doc-aws-s3-2017", "doc-cloudflare-2019"],
+  "completion": "A3.4",
+  "conditions": [
+    {"id": "A3.1", "text": "The change acts on a core system",
+     "kind": "present", "start": "anchor", "path": [["TARGETS", "out"]],
+     "target": {"label": "System", "props": {"kind": "service"}}, "bind": "sys",
+     "citations": [
+       {"doc": "doc-aws-s3-2017", "quote": "one of the inputs to the command was entered incorrectly and a larger set of servers was removed than intended."}]},
+    {"id": "A3.2", "text": "A status, control or recovery tool depends on that system",
+     "kind": "present", "start": "role:sys", "path": [["DEPENDS_ON", "in"]],
+     "target": {"label": "System", "props": {"kind": "recovery_tool"}}, "bind": "tool",
+     "citations": [
+       {"doc": "doc-aws-s3-2017", "quote": "we were unable to update the individual services' status on the AWS Service Health Dashboard (SHD) because of a dependency the SHD administration console has on Amazon S3."},
+       {"doc": "doc-cloudflare-2019", "quote": "Our customers were unable to access the Cloudflare Dashboard or API because they pass through the Cloudflare edge."}]},
+    {"id": "A3.3", "text": "No independent fallback is recorded for that tool",
+     "kind": "absent", "start": "role:tool", "path": [["FALLBACK_FOR", "in"]],
+     "target": {"label": "System"},
+     "citations": [
+       {"doc": "doc-aws-s3-2017", "quote": "we have changed the SHD administration console to run across multiple AWS regions.", "note": "remediation step; implies the console had no independent route before"},
+       {"doc": "doc-cloudflare-2019", "quote": "we had to use a bypass mechanism that wasn't frequently used", "note": "a bypass existed but wasn't practised"}]},
+    {"id": "A3.4", "text": "The change hits the whole system at once",
+     "kind": "present", "start": "anchor", "path": [["HAS_STEP", "out"]],
+     "target": {"label": "Step", "props": {"kind": "rollout", "scope": "all"}},
+     "citations": [
+       {"doc": "doc-aws-s3-2017", "quote": "one of the inputs to the command was entered incorrectly and a larger set of servers was removed than intended."},
+       {"doc": "doc-cloudflare-2019", "quote": "that speed meant that a change to the rules went global in seconds"}]}
+  ]
+}

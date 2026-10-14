@@ -1064,3 +1064,52 @@ understands the failure. NODUS automates the first and makes the second an expli
 **Q&A:**
 - **Q (me): Yes, fix.** A: Fixed the draft quality at the root: stricter checks plus a better prompt.
   The remaining difference (active watchers) is a reviewer's call, which the approval page exists for.
+
+---
+
+## Step 30: Full path: Antibody 3 and the unfinished melody (04:51)
+
+**Q&A:**
+- **Q (me): Is the project perfect as planned?** A: No. The Lite path is complete and works, but the
+  biggest gap is my own understanding (rule 13): the exercises are undone, and the Full-path "aww"
+  pieces (the melody, Antibody 3) weren't built. Recommended order: own it (exercises, the cross-exam, a
+  change of my own), then the video, then optional upgrades.
+- **Q (me): I'll start on understanding; the video comes when it's fully complete (I can't edit it later).
+  Build the upgrades end to end.** A: Built Antibody 3 and the melody (below). Codex review skipped by my choice.
+
+**Antibody 3, "The tool you need depends on the thing that broke"** (AWS S3 2017 + Cloudflare 2019):
+1. Downloaded AWS's own summary of the S3 disruption and checked every quote character for character
+   (7/7; all lessons together: **26/26**).
+2. Two new relationships: `(System)-[:DEPENDS_ON]->(System)` and `(System)-[:FALLBACK_FOR]->(System)`,
+   plus `System.kind` (`service`, `recovery_tool`). They're added to the whitelist, the path
+   type-checker and the vocabulary, so the stricter checks from step 29 cover them too.
+3. Conditions: the change acts on a core system (binds `sys`) → a recovery/status tool depends on it
+   (binds `tool`) → ∅ no fallback recorded for that tool → **completion:** the change hits everything at once.
+4. A new demo plan, **"Shrink the parcel photo archive"**: the Depot Ops Board loads its pages from the
+   archive and has no fallback, so it's **3/4, one step away**, and nothing else fires on it. **Contrast:**
+   billing's recovery console also depends on billing, but a mirror is recorded as its fallback, so it
+   stays quiet (2/4). 3 new G3 tests.
+5. **The evaluation is pinned** to the three lessons it declared, so adding a fourth can't change the
+   published numbers. The README says Antibody 3 isn't in them.
+
+**The unfinished melody** (`nodus/melody.py`, plan B12): a pure function turns the match into WAV
+audio. One note per condition in condition order, with the completion step **last**. The tension notes
+climb D–E–G–A–B (the last is the leading tone), and the completion step is the **tonic**, the note
+your ear expects. A condition that holds plays; a ∅ absence is a short rest; a missing condition is a
+rest; the missing completion step is a **held silence**. *Resolved* plays the tonic, so you hear what
+taking the step would sound like. 7 tests, written first: the event order, the tonic is the highest
+note, the held part is true silence, notes fade in (no clicks), the WAV length equals the events, and
+the same input gives identical bytes. On the Echo page, the browser decoded the hero's clips at 2.09 s
+and 1.87 s, exactly the expected lengths. 112 tests pass.
+
+**First principles: why the missing note is the tonic.**
+In a major key, the leading tone (B in C major) pulls hard towards the tonic (C). A phrase that stops on
+the leading tone feels unfinished. NODUS puts the completion step on the tonic, so "one step away" is
+something you *hear*: the phrase hangs. That mapping is exact: the note is held because the
+condition doesn't hold. It isn't decoration, because the sound is generated only from the match result.
+
+**First principles: how a sound becomes bytes.**
+Sound is air pressure changing over time. A WAV file stores that as numbers: 44,100 samples per second,
+each a 16-bit integer. A note at frequency f is `sin(2π·f·t)` sampled at those times (plus two softer
+overtones for warmth), shaped by an envelope that fades in over 10 ms and decays. A rest is zeros.
+Python's `wave` module writes the header; Streamlit's `st.audio` plays the bytes when clicked.

@@ -5,6 +5,7 @@ from app_pages.common import level_html, setup
 from nodus.agent import echo_id, echo_record
 from nodus.lessons import active_lessons, lesson_detail
 from nodus.matcher import evaluate
+from nodus.melody import melody_events, melody_wav
 from nodus.plans import list_plans
 from nodus.severity import level
 from nodus.svg import alignment_svg
@@ -48,6 +49,22 @@ st.markdown(alignment_svg(les["name"], plans[plan_id], rows, result.k, result.n,
             unsafe_allow_html=True)
 st.caption("Green ✓ holds in the plan. Violet ∅ is something not recorded in the company graph. "
            "The dashed red ring is the completion step. Grey means not present.")
+
+states = [(c.holds, spec["kind"] == "absent") for c, spec in zip(result.conditions, les["conditions"])]
+comp = [c["id"] for c in les["conditions"]].index(les["completion"])
+st.subheader("Hear it")
+c1, c2 = st.columns(2)
+with c1:
+    st.write("What the plan already has: one note per condition that holds, a short silence "
+             "for each ∅, and the completion step's note held back.")
+    st.audio(melody_wav(melody_events(lesson_id, states, comp)), format="audio/wav")
+with c2:
+    if not states[comp][0]:
+        st.write("Resolved: the same phrase if the plan took the completion step. "
+                 "That last note is the step not to take.")
+        st.audio(melody_wav(melody_events(lesson_id, states, comp, resolve=True)), format="audio/wav")
+    else:
+        st.write("The completion step is already in the plan: the phrase resolves on its own.")
 
 record = echo_record(g, echo_id(lesson_id, plan_id))
 st.header("What NODUS told the owner")

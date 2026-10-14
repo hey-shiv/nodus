@@ -138,3 +138,12 @@ least one condition or witness rule.
 Personal data, message bodies, social graphs, PageRank and centrality (decoration),
 `Team` nodes (no condition needs one yet), and Echo 3–5 relationships such as
 `DEPENDS_ON` (Full path only, added if Antibody 3 is built).
+
+## Added for Antibody 3 (Oct 15, after the Lite path)
+
+| Relationship | Needed by |
+|---|---|
+| `(System)-[:DEPENDS_ON]->(System)` | A3.2: a recovery/status tool depends on the system the plan changes |
+| `(System)-[:FALLBACK_FOR]->(System)` | A3.3 (absence): no independent fallback is recorded for that tool |
+
+`System.kind` joins the controlled vocabularies: `service`, `recovery_tool`.

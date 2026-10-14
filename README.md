@@ -12,6 +12,7 @@ past failure, NODUS:
 - names the **one remaining step** that would complete the repeat (foresight, not hindsight);
 - points out what is **not recorded** in the graph (no one watching the alerts, no owner);
 - invites **the person who warned last time**, by their role in the original episode;
+- plays the match as an **unfinished melody**: one note per condition, the last one held back;
 - **remembers** what the team did about it, so each lesson builds a track record.
 
 Built for **Graph Hacks (FalkorDB × WeMakeDevs), Oct 15–18, 2026**.
@@ -47,8 +48,8 @@ uv pip install --python .venv/bin/python -r requirements.txt   # or: .venv/bin/p
 ```
 
 In the app, use **Reset the demo** in the sidebar at any time. Then:
-1. **Plans:** the hero plan is "one step away" on three lessons. Open **Compare with keyword search**.
-2. **Echo:** the past failure beside the plan, every condition with its source sentence.
+1. **Plans:** the hero plan is "one step away" on three lessons, and the photo-archive plan on a fourth. Open **Compare with keyword search**.
+2. **Echo:** the past failure beside the plan, every condition with its source sentence. Under **Hear it**, play the unfinished melody, then the resolved one.
 3. **Plans → Change a plan:** add a *rollout* to *every target* and save. Foresight becomes a full echo.
 4. **Inbox** (viewing as Lena Brandt, the owner): record what you'll do. Asha Rao, who warned last time, has an invitation.
 5. **Lessons:** the track record updates; lessons can be approved, rejected, or drafted by an LLM.
@@ -75,6 +76,7 @@ Check with `.venv/bin/python scripts/llm_check.py`. The demo needs neither.
    (Plan)-[:HAS_STEP]->(Step)          (Plan)-[:TARGETS]->(System)-[:ALERTS_TO]->(Channel)
    (Person)-[:RAISED]->(Concern)-[:ABOUT]->(Plan)
    (Episode)-[:INVOLVED]->(Plan)       (Episode)-[:DESCRIBED_IN]->(Document)<-[:AUTHORED]-(Person)
+   (System)-[:DEPENDS_ON]->(System)    (System)-[:FALLBACK_FOR]->(System)      recovery tools and their fallbacks
  LESSONS (the immune memory's definitions)
    (Lesson)-[:HAS_CONDITION]->(Condition)-[:CITES {quote}]->(Document)
    (Lesson)-[:LEARNED_FROM]->(Episode | Document)
@@ -91,7 +93,7 @@ needs it ([docs/graph-model.md](docs/graph-model.md), ADR-004). Every node has a
 1. **Lessons are data.** Each lesson has 3–6 conditions of four kinds: `present`, `absent`,
    `attribute_equals`, `count_equals` ([docs/condition-kinds.md](docs/condition-kinds.md)).
    Each condition quotes the sentence it comes from, verified word for word
-   (`scripts/verify_sources.py`: 19/19 quotes; for the SEC page set `NODUS_CONTACT="Your Name you@example.com"`, which sec.gov requires of automated requests). A person approves a lesson before it is used.
+   (`scripts/verify_sources.py`: 26/26 quotes; for the SEC page set `NODUS_CONTACT="Your Name you@example.com"`, which sec.gov requires of automated requests). A person approves a lesson before it is used.
 2. **A deterministic compiler** (`nodus/compiler.py`) turns each condition into one
    parameterized query from a hand-written template. Labels and relationship types are
    checked against a whitelist; every value is a `$parameter`. **No AI writes a query that runs.**
@@ -105,7 +107,12 @@ needs it ([docs/graph-model.md](docs/graph-model.md), ADR-004). Every node has a
    heads-up (template-filled from the match) and witness invitation → **remember** an Echo
    record with a stable id. The owner records heeded / dismissed (a reason is required) /
    escalated; the lesson's track record is counted from outcomes. It never edits a plan or approves anything.
-6. **Witnesses** (`nodus/witnesses.py`) by role, in order: an active person whose concern in the
+6. **The unfinished melody** (`nodus/melody.py`): a pure function renders the match as WAV audio.
+   Each condition is a note in condition order with the completion step last; conditions that hold
+   play, an absence is a short rest, and the completion step's note (the tonic that resolves the
+   phrase) is held back as silence. "Resolved" plays it. It carries nothing that isn't in the match,
+   never autoplays, and the alignment picture is its visual equivalent.
+7. **Witnesses** (`nodus/witnesses.py`) by role, in order: an active person whose concern in the
    original episode was overruled → the post-mortem's author → the owner of the system. Public
    lessons cite their documents, never people. Graph distance is never used as "expertise".
 
@@ -172,7 +179,8 @@ never-written graph raise "empty key"; the default query timeout is 1 s.
 ## Evaluation (synthetic)
 
 Declared in [eval/DECLARATION.md](eval/DECLARATION.md) and committed **before** any evaluation
-data existed; test split run once. Full results and limits in [eval/RESULTS.md](eval/RESULTS.md).
+data existed; test split run once. It covers the three lessons it declared; Antibody 3 was added
+later and is **not** part of these numbers. Full results and limits in [eval/RESULTS.md](eval/RESULTS.md).
 
 | Test split (synthetic) | NODUS | Keyword search (TF-IDF) |
 |---|---|---|
@@ -195,7 +203,7 @@ stakes. The embedding baseline was declared but not run.
   type from a plan's text (4 of 5 and 3 of 5 agreed with the recorded roles on the demo plans,
   at low confidence). A suggestion never affects matching until a person confirms it.
 - **Absent means absent in the recorded graph.** NODUS can't see what was never recorded.
-- **Small, synthetic world;** four public incidents; hand-authored lessons (an LLM drafting
+- **Small, synthetic world;** five public incidents; hand-authored lessons (an LLM drafting
   path exists and is checked).
 - **Structure can't see stakes** (see the evaluation). Dismissal reasons are the feedback path.
 - NODUS flags **structural resemblance to approved lessons**. It does not predict incidents.
@@ -206,7 +214,8 @@ Real companies appear only as cited sources, quoted verbatim with neutral wordin
 [Cloudflare, Jul 2 2019](https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/),
 [CrowdStrike, Jul 19 2024](https://www.crowdstrike.com/falcon-content-update-remediation-and-guidance-hub/),
 [U.S. SEC on Knight Capital, 2012](https://www.sec.gov/news/press-release/2013-222),
-[GitLab, Jan 31 2017](https://about.gitlab.com/blog/postmortem-of-database-outage-of-january-31/).
+[GitLab, Jan 31 2017](https://about.gitlab.com/blog/postmortem-of-database-outage-of-january-31/),
+[AWS S3, Feb 28 2017](https://aws.amazon.com/message/41926/).
 NODUS cites and summarises; it doesn't redistribute these pages (they're cached locally, gitignored).
 
 ## Tracks
@@ -223,7 +232,7 @@ NODUS cites and summarises; it doesn't redistribute these pages (they're cached 
 - **Data:** see [DATA.md](DATA.md). Synthetic company plus cited public post-mortems; no private data.
 - **Pre-event work** was limited to learning, notes, research and diagrams, as rule 8 allows. This
   repository was created after the event started (first commit: Oct 15, 2026, 02:59 IST).
-- **Decisions:** [docs/decisions/](docs/decisions/) (ADR-001 to ADR-008).
+- **Decisions:** [docs/decisions/](docs/decisions/) (ADR-001 to ADR-009).
 
 ## Project layout
 
@@ -245,6 +254,7 @@ nodus/            the engine (no Streamlit imports)
   suggest.py      optional Laya role suggestions (human-confirmed) and reason guesses
   baseline.py     TF-IDF keyword baseline
   svg.py          the alignment picture (a pure function)
+  melody.py       the unfinished melody, as WAV bytes (a pure function)
 app.py, app_pages/  Streamlit UI (no Cypher in page files)
 data/             lessons, synthetic post-mortems, source registry
 eval/             declaration, generator, runner, results

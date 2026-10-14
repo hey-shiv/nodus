@@ -17,7 +17,10 @@ from nodus.severity import is_warning, level
 
 SEEDS = {"dev": 101, "test": 202}
 HERE = Path(__file__).resolve().parent
-LESSONS = [load_lesson_file(p) for p in sorted((HERE.parent / "data" / "lessons").glob("*.json"))]
+# The three lessons named in eval/DECLARATION.md. Pinned so lessons added later (Antibody 3)
+# can't change the declared, already-published evaluation.
+DECLARED = ("antibody-1", "antibody-2", "internal-quiet-push")
+LESSONS = [load_lesson_file(HERE.parent / "data" / "lessons" / f"{lid}.json") for lid in DECLARED]
 
 
 def build(split):

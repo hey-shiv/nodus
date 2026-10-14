@@ -65,7 +65,7 @@ def _infrastructure(w):
         ("sys-label", "Label Printing", "ch-label-mail", "p-asha"),
         ("sys-invoice", "Invoice Export", "ch-pager", "p-mei"),
     ]:
-        w.node("System", id_, name=name)
+        w.node("System", id_, name=name, kind="service")
         w.rel("ALERTS_TO", id_, channel)
         w.rel("OWNS", owner, id_)
 
@@ -113,6 +113,25 @@ def _current_plans(w):
           follows=["proc-canary"], gates=["chk-human"],
           steps=[("canary", "subset", 1), ("rollout", "subset", 2)],
           description="Rename two columns in the monthly billing export.")
+
+
+def _antibody3_plan(w):
+    """A plan whose system is what the depots' ops board depends on, with no fallback."""
+    w.node("System", "sys-photos", name="Parcel Photo Archive", kind="service")
+    w.rel("ALERTS_TO", "sys-photos", "ch-pager")
+    w.rel("OWNS", "p-kai", "sys-photos")
+    w.node("System", "sys-opsboard", name="Depot Ops Board", kind="recovery_tool")
+    w.rel("DEPENDS_ON", "sys-opsboard", "sys-photos")    # the board loads its pages from the archive
+    w.rel("OWNS", "p-mei", "sys-opsboard")
+    _plan(w, "plan-photos", "Shrink the parcel photo archive", "standard", "infra_change",
+          "planned", "p-kai", "sys-photos", follows=["proc-canary"], gates=["chk-human"],
+          steps=[("test", "subset", 2)],
+          description="Retire older archive nodes to cut hosting costs.")
+    # Contrast: the billing reports have a recovery tool WITH a fallback recorded.
+    w.node("System", "sys-billing-console", name="Billing Recovery Console", kind="recovery_tool")
+    w.rel("DEPENDS_ON", "sys-billing-console", "sys-billing")
+    w.node("System", "sys-billing-mirror", name="Billing Console Mirror", kind="recovery_tool")
+    w.rel("FALLBACK_FOR", "sys-billing-mirror", "sys-billing-console")
 
 
 def _episodes(w):
@@ -174,6 +193,7 @@ def generate(seed=7, background=12):
     _people(w)
     _infrastructure(w)
     _current_plans(w)
+    _antibody3_plan(w)
     _episodes(w)
     _background(w, rng, background)
     return {"nodes": w.nodes, "rels": w.rels}

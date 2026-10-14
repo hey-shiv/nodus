@@ -52,3 +52,20 @@ def test_past_plans_are_not_watched(table):
 def test_unapproved_lessons_never_match(graph):
     build(graph, approve_as=None)
     assert run(graph) == []
+
+
+def test_photo_archive_is_one_step_from_antibody_3(table):
+    assert kn(table, "plan-photos", "antibody-3") == (3, 4, "foresight")
+    r = table[("plan-photos", "antibody-3")]
+    assert r.bindings == {"sys": "sys-photos", "tool": "sys-opsboard"}
+    assert r.missing == ["A3.4"]
+
+
+def test_a_recorded_fallback_breaks_the_antibody_3_shape(table):
+    r = table[("plan-billing", "antibody-3")]
+    assert "A3.3" in r.missing and r.status == "partial"     # the mirror is the fallback
+
+
+def test_photo_archive_echoes_nothing_else(table):
+    assert [l for (p, l), r in table.items() if p == "plan-photos"
+            and r.status in ("full", "foresight", "strong")] == ["antibody-3"]
