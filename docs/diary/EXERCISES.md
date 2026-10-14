@@ -103,3 +103,30 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>The docs conflict on temporal arithmetic and `datetime()` is undocumented; integers compare and subtract correctly with no surprises. Convert only for display.</details>
 
 **Self-check:**
+
+---
+
+## Step 10: Graph model
+
+**E22.** Property or relationship? (a) a plan is "routine", (b) a system's alerts go to a channel, (c) a step happens at a time. Why?
+<details><summary>Key</summary>(a) property: a plain attribute you filter on. (b) relationship: you need to follow it and ask "who watches that channel?". (c) property (epoch int): compared, never traversed.</details>
+
+**E23.** What's the rule for adding a node kind, and which failure does it prevent?
+<details><summary>Key</summary>No node kind without a condition (or witness rule) that needs it. It prevents "graph decoration": a big graph where most nodes do no work.</details>
+
+**E24.** Why are lessons stored in FalkorDB rather than a JSON file?
+<details><summary>Key</summary>FalkorDB is the system of record (invariant). In the graph, each condition links to its cited document and each echo links to its lesson, so every answer traces back through the graph.</details>
+
+**E25.** Condition A2.1 finds the alert channel. How does A2.3 make sure it checks the *same* channel?
+<details><summary>Key</summary>A2.1 returns the channel's id; A2.3 receives it as a parameter `$ch` (anchor-first, D08). Shared bindings by construction.</details>
+
+**E26.** Prediction: someone adds a rollout step with `scope:'all'` to the hero plan. What are k/n for Antibody 1 and Antibody 2 now?
+<details><summary>Key</summary>Antibody 1: 5 of 5 (full match: the failure shape is complete). Antibody 2: 4 of 4. Both completion steps now hold, so this has turned from foresight into an active risk.</details>
+
+**E27.** Why does `RETURN NOT (p)-[:FOLLOWS]->()` fail, and what are two correct ways to write it?
+<details><summary>Key</summary>Outside WHERE a pattern is a list of paths, not a boolean. Use `WHERE NOT (p)-[:FOLLOWS]->()` to filter, or `RETURN size([(p)-[f:FOLLOWS]->(x) | x]) = 0`.</details>
+
+**E28.** In A2.3 the watcher is an inactive person (left the company). Does the condition hold? Why does that matter?
+<details><summary>Key</summary>Yes: it counts only `active:true` watchers. A channel "watched" only by someone who left is effectively unwatched. That's the GitLab/Knight shape.</details>
+
+**Self-check:**

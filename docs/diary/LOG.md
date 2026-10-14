@@ -322,3 +322,61 @@ approves it" stays one person across conditions.
 
 **Open:**
 - Indexes on `id` properties: add when the loader exists (T12).
+
+---
+
+## Step 10: T07, graph model v1 (03:45)
+
+**What:** designed the graph model in `docs/graph-model.md` (decision: ADR-004).
+1. Listed every condition of the Lite-path lessons: Antibody 1 (5 conditions), Antibody 2
+   (4 conditions) and the internal lesson.
+2. For each condition, wrote down the relationship it needs.
+3. Kept only node kinds and relationships that some condition (or witness rule) needs.
+4. Wrote each condition as a Cypher sketch and **ran them all** on a tiny hand-made hero
+   plan: 4 of 5 for Antibody 1, 3 of 4 for Antibody 2, with only the completion step missing.
+
+**Why "conditions first"?** The tempting move is to model "a company" (teams, docs,
+tickets, Slack) and hope lessons fit. That produces a big graph where most of it does
+nothing: the "decoration" the rules warn about. Starting from the conditions means every
+relationship does work in a query, and the model stays small enough to build in 4 days.
+
+**First principles: nodes, relationships, properties, labels.**
+- A **node** is a thing (a plan, a person). Its **label** (`Plan`) says what kind of thing.
+- A **relationship** is a directed, typed connection (`(Plan)-[:TARGETS]->(System)`).
+- **Properties** are key–value facts stored on either (`risk_class: 'routine'`).
+- Rule of thumb: if you'll ever need to *follow* it, or ask "who/what else connects to
+  this?", make it a relationship. If it's a plain attribute you filter on, make it a property.
+  That's why "the channel the alerts go to" is a relationship (A2.3 needs to ask "who
+  watches *this* channel?"), but "routine" is a property.
+
+**First principles: the three layers.**
+- **World:** the company itself (synthetic): plans, systems, channels, people.
+- **Lessons:** the immune memory's definitions, stored *in the graph too*, so FalkorDB is
+  the system of record and each condition can link to the document sentence it cites.
+- **Echoes:** what the agent found and what happened next (its memory). Built later (T22–T23).
+
+**First principles: the anchor (plan D08).**
+Every match starts from one plan, the anchor. Each condition is a small query that takes
+the anchor's id as a parameter. When one condition finds something another needs (the
+staged-rollout procedure, the alert channel), its id is passed along as a parameter
+too. That guarantees "the channel" in condition 3 is the same channel as in condition 1.
+
+**First principles: why the hero scores n−1.**
+The hero plan is routine, skips the staged procedure others follow, has one automated
+gate, and its alerts go to an unwatched email list. It has **not yet** added a rollout
+step to all servers. That missing step is the completion condition, so NODUS can say:
+*"this plan is one step away from a known disaster, and the step is: rolling out to everything at once."*
+
+**Problem and fix:**
+- **Symptom:** `RETURN NOT (p)-[:FOLLOWS]->(...)` failed: "Type mismatch: expected Boolean or Null but was List".
+- **Cause:** outside `WHERE`, a pattern means "the list of matching paths", not true/false.
+- **Fix:** use `WHERE NOT (pattern)` to filter rows, or `size([pattern comprehension]) = 0` to get a boolean.
+- **How to spot it next time:** "expected Boolean … but was List" means a pattern is being used as a value.
+- A leftover `lab_` graph from the crashed script was deleted. Scratch scripts now delete in `finally:`.
+
+**Q&A:**
+- **Q (me): Draft the model from the plan's B2 needs, explain it, add exercises.** A: Done, in this step.
+
+**Open:**
+- Exact condition wording and source sentences: T14 (internal) and T16 (antibodies).
+- Condition *kinds* and the compiler that turns them into queries: T08.
