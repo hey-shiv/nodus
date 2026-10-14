@@ -181,3 +181,24 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>A1.2 checks *other* plans following a staged procedure, a company-level fact that doesn't depend on the anchor. Fix: verify the anchor exists before evaluating.</details>
 
 **Self-check:**
+
+---
+
+## Steps 14–15: World and loader
+
+**E42.** For each designed plan, name its demo role and what NODUS should say about it.
+<details><summary>Key</summary>Hero: foresight on Antibody 1 (4/5), Antibody 2 (3/4), internal lesson (4/5). Maps: internal lesson full. Sensor (control): no echo despite CrowdStrike-like words. Scanner (near-miss): 3/5, not raised. Billing (clean): nothing.</details>
+
+**E43.** Why must the hero share *no* keywords with the public post-mortems, and the control share *many*?
+<details><summary>Key</summary>It's the experiment: a text search would flag the control and miss the hero. If NODUS catches the hero and ignores the control, it's matching structure, not words.</details>
+
+**E44.** Prediction: you change the seed from 7 to 8. Does the hero's k change?
+<details><summary>Key</summary>No. The seed only drives background plans, which all follow the staged procedure. A1.2 still holds (other plans follow it), and the hero's own structure is fixed.</details>
+
+**E45.** Prediction: the loader used `CREATE` instead of `MERGE`, and you load twice. What's the hero's A1.4 result?
+<details><summary>Key</summary>Two hero plans with the same id, two gate relationships... count_equals sees 2 GATED_BY (or duplicated rows), so "only one gate" fails. Duplicates silently corrupt counts.</details>
+
+**E46.** Why MATCH both endpoints before MERGE-ing a relationship?
+<details><summary>Key</summary>MERGE on a whole pattern creates every missing part, including new endpoint nodes. Matching first means the relationship attaches only to existing nodes.</details>
+
+**Self-check:**

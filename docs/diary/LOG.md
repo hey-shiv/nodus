@@ -481,3 +481,100 @@ the results. Each call is a smaller version of the same problem, ending when the
 **Open:**
 - **Codex review** of T06–T09 (the plan asks for an independent review of ★ cards).
 - Lessons are test data for now; storing and loading them from FalkorDB comes at T14–T17.
+
+---
+
+## Step 13: T10, day-1 review (Oct 15, 05:00)
+
+**What:** G1 marked passed (`docs/g1-lab.md`). Confirmed the **Lite path** (ADR-006).
+Decided the LLM's role (ADR-007): optional, used only for lesson *drafts*; all wording
+shown to users comes from templates filled with match results; demo lessons are
+hand-authored and pass the same checks an AI draft would.
+
+**Why:** G1 finished early, so the plan allowed Full. But with five prep days skipped,
+the margin is worth more as correctness and explanation than as extras. And because no
+money can be spent and no local model is installed, the product must run with zero keys.
+
+**First principles: why templates instead of AI wording for heads-ups?**
+A template like "{plan} has {k} of {n} conditions of '{lesson}'. Missing: {step}" can only
+say what the graph found. An AI writing free text might say something the evidence
+doesn't support, and a heads-up that overstates is worse than none.
+
+**Q&A:**
+- **Q (me): Keep building, I want the entire end-to-end project.** A: Building every
+  Lite card through T35. The video (T36) and the submission (T38) need me.
+
+**Open:**
+- Want live AI drafts later? Install a small Ollama model (a download, ask first) or set a free-tier key.
+
+---
+
+## Step 14: T11, the synthetic world (05:20)
+
+**What:** invented a fictional company, **Tern & Tally Freight** (`docs/world-story.md`),
+and wrote `nodus/world.py`, which generates it as plain data: 86 nodes and 145
+relationships, every node marked `origin: synthetic` with a `source`. The core is designed
+by hand (5 current plans, 2 past episodes, people, systems, channels). A **seed** drives 12
+background plans that all followed the staged procedure. 7 tests in `tests/test_world.py`.
+
+| Plan | Demo role | Why it exists |
+|---|---|---|
+| Refresh tariff tables for every depot | hero | echoes 2 public antibodies + the internal lesson, one step away |
+| Swap map tile provider | internal echo | matches only the company's own lesson |
+| Global rollout of dock sensor content update | control | *sounds* like CrowdStrike, isn't shaped like it |
+| Scanner handheld OS patch | near-miss | 3 of 5: close, but not raised |
+| Billing report column rename | clean | nothing |
+
+**Why each choice:**
+- **Designed, not random, core:** each plan exists to prove one claim (an "aww" moment
+  or an evaluation family). Random plans wouldn't reliably contain the shapes.
+- **The hero shares no key terms** with the public post-mortems (a test checks this)
+  and **the control shares many**: that's the whole argument. Text search should flag the
+  control and miss the hero; NODUS does the opposite.
+- **Background plans that followed the procedure:** A1.2 needs "other changes use staged
+  rollout" to be a *fact in the graph*, not an assumption.
+
+**First principles: what a seed does.**
+A computer's "random" numbers come from a formula that starts from one number, the seed.
+Same seed → same sequence → same world, every run. Tests can then expect exact counts,
+and a judge running the project gets the identical world.
+
+**Q&A:**
+- **Q (me): No local model is available, any solution?**
+  A: Free options: a local Ollama model (offline, no key), or a free Gemini/Groq key. I asked
+  for keys from 6–7 Google accounts, rotated as each runs out, then a strong local model.
+  Claude's answer: local **Gemma 4 12B (QAT, 7.2 GB)** is downloading, the strongest that fits
+  16 GB next to Docker and the app; Gemini is supported with **one** key in `.env`, falling back
+  to local Gemma when the quota ends. Rotating across many accounts wasn't built: Google's API
+  terms prohibit creating multiple accounts to get around usage limits, and a ban mid-event
+  would cost more than the quota. API keys go in `.env` (gitignored), never into a chat.
+
+---
+
+## Step 15: T12, the loader (05:30) → G2
+
+**What:** `nodus/db.py` (one place that knows how to connect) and `nodus/loader.py`:
+nodes are grouped by label and written with `UNWIND $rows … MERGE (n:Label {id: row.id})
+SET n += row.props`; relationships are grouped by (type, from-label, to-label), and both
+endpoints are `MATCH`ed before `MERGE`ing the relationship. Every label's `id` gets an index.
+Tests: the loaded counts equal the generator's own counts, and **loading twice changes nothing**.
+G2 passed.
+
+**Why:**
+- **`MERGE` instead of `CREATE`:** `CREATE` always adds; run the loader twice and you'd have
+  two of everything, and every count (k of n!) would double. `MERGE` means "find it by id,
+  create it only if missing", so the loader can run any number of times (idempotent).
+- **`UNWIND` a list:** one query per label with all rows as a parameter, instead of one
+  query per node. Fewer round trips, and values stay parameters.
+- **MATCH endpoints, then MERGE the relationship:** `MERGE (a:Plan {id:…})-[:X]->(b…)` in one
+  pattern would create *new* endpoint nodes whenever the full pattern isn't found. Matching
+  first guarantees the relationship attaches to the existing nodes.
+- **Index on `id`:** without it, every `MERGE`/`MATCH` by id scans every node of that label.
+
+**Problem and fix:**
+- **Symptom:** "Invalid graph operation on empty key" on the first load.
+- **Cause:** listing a graph's indexes fails when the graph doesn't exist yet.
+- **Fix:** just `CREATE INDEX`, and treat FalkorDB's "already indexed" error as fine.
+- **How to spot it next time:** "empty key" means the graph hasn't been created yet.
+
+**Q&A:** none.
