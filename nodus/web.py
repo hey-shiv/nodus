@@ -3,6 +3,7 @@
 Each function reads one sandbox graph and returns plain data. Matching, severity, wording, the
 SVG drawing and the melody all come from the same tested modules the Streamlit app uses.
 """
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from nodus.agent import acknowledge, echo_id, echo_record, messages_for, on_plan_saved, track_record
@@ -27,11 +28,19 @@ def _states(lesson, result):
 
 def plans_overview(g):
     lessons = active_lessons(g)
+    all_plans = list_plans(g)
+    # Each (plan, lesson) check is a short chain of reads that depends on nothing else, so run
+    # the chains side by side. On a hosted database every read is a network round trip, and in
+    # sequence the ~130 reads behind this page took 26 s from Vercel.
+    pairs = [(p[0], les) for p in all_plans for les in lessons]
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        results = dict(zip([(pid, les["id"]) for pid, les in pairs],
+                           pool.map(lambda pl: evaluate(g, pl[0], pl[1]), pairs)))
     plans = []
-    for pid, title, summary, risk, owner in list_plans(g):
+    for pid, title, summary, risk, owner in all_plans:
         rows = []
         for les in lessons:
-            r = evaluate(g, pid, les)
+            r = results[(pid, les["id"])]
             lvl = level(r.k, r.n, r.missing, les["completion"])
             states, comp = _states(les, r)
             rows.append({"lesson": les["id"], "name": les["name"], "origin": les["origin"],

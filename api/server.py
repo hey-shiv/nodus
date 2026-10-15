@@ -4,6 +4,7 @@ Every request after POST /api/sandbox carries the visitor's sandbox id in the
 X-Nodus-Sandbox header; all reads and writes go to that private graph copy.
 """
 import re
+import time
 import uuid
 
 from ag_ui.core import RunAgentInput
@@ -35,8 +36,12 @@ def _id(value, what="id"):
 
 @app.get("/api/health")
 def health():
-    get_db().connection.ping()
-    return {"ok": True}
+    # db_ms: one database round trip, so a slow site can be told apart from a far-away database.
+    db = get_db()
+    db.connection.ping()
+    t = time.perf_counter()
+    db.connection.ping()
+    return {"ok": True, "db_ms": round((time.perf_counter() - t) * 1000, 1)}
 
 
 @app.post("/api/sandbox")
