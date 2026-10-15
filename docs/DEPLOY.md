@@ -30,9 +30,11 @@ returned 200, `/api/health` answered, and a visitor sandbox was created.
 ### 1. Create the database (5 minutes)
 
 1. Sign up at <https://app.falkordb.cloud> and create a **Free** instance.
-   Pick the region closest to where the API runs. This project's API runs in Mumbai (`bom1`,
-   visible in the Vercel logs), so choose **AWS ap-south-1 (Mumbai)** if it is offered; otherwise
-   pick any region and set `"regions"` in `vercel.json` to the matching Vercel region.
+   This project's database is in **AWS ap-south-1 (Mumbai)**, and `vercel.json` runs the API in
+   the matching Vercel region, `bom1`. If you pick another region, change `"regions"` to match:
+   from the wrong region every query paid a 185 ms round trip and the plans page took 26 s.
+   (Don't read the region from the request logs: the `region` there is the edge that received
+   the request, not where the API ran. `vercel inspect <deployment>` shows the function region.)
 2. Open the instance's **Connect** page and keep it open: you need host, port, username and
    password.
 
@@ -49,9 +51,9 @@ It asks for the four values; the password is typed hidden and never saved. It en
 
 ### 3. Create the Vercel project (5 minutes)
 
-Already done for `hey-shiv/nodus`: the project `nodus` exists and https://nodus-livid-seven.vercel.app
-serves the home page. Only the environment variables (point 3) and a redeploy are left.
-
+Already done for `hey-shiv/nodus`: the project `nodus` is live at https://nodus-livid-seven.vercel.app,
+the four variables are set, and every push to `main` redeploys it. The steps below are for setting it up
+from scratch.
 
 1. Sign up at <https://vercel.com> with your GitHub account.
 2. **Add New → Project → Import** `hey-shiv/nodus`. Vercel reads `vercel.json` and shows two
@@ -70,7 +72,7 @@ serves the home page. Only the environment variables (point 3) and a redeploy ar
 
 ### 4. Check it
 
-- `https://<your-site>/api/health` shows `{"ok":true}`.
+- `https://<your-site>/api/health` shows `{"ok":true,"db_ms":...}`. `db_ms` is one database round trip; it should be a few milliseconds at most.
 - On **Live demo**, saving the plan shows the heads-up and the "4 of 5" checklist.
 
 ## Known limits (honest list)

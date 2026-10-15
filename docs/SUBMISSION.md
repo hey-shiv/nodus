@@ -21,8 +21,9 @@ Everything for the Graph Hacks form, ready to paste. Only two things are left fo
 
 **Demo video:** *(paste the link after uploading)*
 
-**Deployment:** Local setup (tested from a fresh clone): README "Quick start", about 5 minutes
-with Docker and Python 3.12.
+**Deployment:** Live at https://nodus-livid-seven.vercel.app (Next.js website + FastAPI on Vercel,
+FalkorDB Cloud). Every visitor gets a private copy of the demo company. Local setup (tested from a
+fresh clone): README "Quick start", about 5 minutes with Docker and Python 3.12.
 
 **Tracks:** Track 03 Company Brain (primary). Also fits Track 01 (Agents That Act on Connected
 Data) and Track 02 (Agent Memory). *My decision at submission: enter 03, and add 01 if the form
@@ -118,11 +119,12 @@ and no fallback is recorded. And: Plans → Change a plan → Add a step: *rollo
 
 ## Final checklist (in order)
 
-- [ ] Gemini key in `.env` (optional) and `scripts/llm_check.py` passes
+- [x] Gemini key in `.env` (optional) and `scripts/llm_check.py` passes
+- [x] Website live on Vercel (`docs/DEPLOY.md`)
 - [ ] Record the video (OBS or QuickTime), upload (YouTube unlisted or Loom), check it plays logged out
 - [ ] Paste the video link into the README ("Demo video" line) and commit
 - [ ] Glance at the FalkorDB and WeMakeDevs Discord announcements for any form changes
-- [ ] Codex review of `nodus/compiler.py` and `nodus/matcher.py` (plan step for the core cards)
+- [x] ~~Codex review of `nodus/compiler.py` and `nodus/matcher.py`~~ (skipped by my choice)
 - [ ] Fill in the form with the answers above; name the track(s)
 - [ ] Screenshot the confirmation into `docs/` and commit
 - [ ] Optional: publish the blog post (`docs/blog-post.md`) for the side prize

@@ -3,6 +3,8 @@
 > **Learn from mistakes you never made.**
 > Different words. Same shape.
 
+**Try it live:** https://nodus-livid-seven.vercel.app (no sign-up; you get your own copy of a made-up company)
+
 NODUS is an immune memory for a company. It turns lessons from post-mortems (the
 company's own, and famous public ones) into **patterns of roles and relationships in a
 FalkorDB graph**, then checks every plan against them. When a plan takes the *shape* of a

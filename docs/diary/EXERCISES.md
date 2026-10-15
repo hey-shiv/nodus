@@ -379,3 +379,20 @@ The brief (what NODUS is) has its own file: `00-brief.md`. Do that one first.
 <details><summary>Key</summary>It's generated only from the match result (which conditions hold, which is the completion step), carries no extra information, has a visual equivalent, and never autoplays.</details>
 
 **Self-check:**
+
+## Deployment and latency (steps 33–34)
+
+1. A page makes 40 database reads one after another, and each round trip takes 120 ms. Roughly how long
+   does it take? If you run them 8 at a time, what's the best case?
+   <details><summary>Answer</summary>40 × 120 ms = 4.8 s. Eight at a time: 5 rounds × 120 ms ≈ 0.6 s, as
+   long as the reads don't depend on each other.</details>
+2. Why couldn't all 130 reads in the plans page run at the same time, even in principle?
+   <details><summary>Answer</summary>Within one plan-and-lesson check, later conditions use what earlier
+   ones bound (for example `sys`, then `tool`), so those reads must happen in order. Only separate checks
+   are independent.</details>
+3. The logs said `bom1`, but moving the API to `iad1` changed nothing. What did `bom1` actually describe?
+   <details><summary>Answer</summary>The edge region that received the request (close to the visitor),
+   not the region where the function ran. Check `vercel inspect`, which lists each function's region.</details>
+4. Why does every visitor get their own copy of the graph?
+   <details><summary>Answer</summary>So one visitor's edits can't change what the next one sees. Each visit
+   starts from the same known state, and old copies are cleaned up.</details>
