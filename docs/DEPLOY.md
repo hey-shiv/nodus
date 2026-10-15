@@ -30,7 +30,9 @@ returned 200, `/api/health` answered, and a visitor sandbox was created.
 ### 1. Create the database (5 minutes)
 
 1. Sign up at <https://app.falkordb.cloud> and create a **Free** instance.
-   Pick **AWS, us-east-1** so it sits next to Vercel's default region (Washington, `iad1`).
+   Pick the region closest to where the API runs. This project's API runs in Mumbai (`bom1`,
+   visible in the Vercel logs), so choose **AWS ap-south-1 (Mumbai)** if it is offered; otherwise
+   pick any region and set `"regions"` in `vercel.json` to the matching Vercel region.
 2. Open the instance's **Connect** page and keep it open: you need host, port, username and
    password.
 
@@ -46,6 +48,10 @@ It asks for the four values; the password is typed hidden and never saved. It en
 "The cloud database is ready."
 
 ### 3. Create the Vercel project (5 minutes)
+
+Already done for `hey-shiv/nodus`: the project `nodus` exists and https://nodus-livid-seven.vercel.app
+serves the home page. Only the environment variables (point 3) and a redeploy are left.
+
 
 1. Sign up at <https://vercel.com> with your GitHub account.
 2. **Add New → Project → Import** `hey-shiv/nodus`. Vercel reads `vercel.json` and shows two

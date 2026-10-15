@@ -7,3 +7,5 @@ web/.next/
 tests/
 eval/*-output.md
 docs/diary/.jots.md
+.env.local
+.vercel/
