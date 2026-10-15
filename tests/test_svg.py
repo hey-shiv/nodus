@@ -6,6 +6,7 @@ import pytest
 from nodus.lessons import active_lessons
 from nodus.matcher import evaluate
 from nodus.svg import alignment_svg, shape_strip
+from nodus.theme import COLORS
 from nodus.view import Row, rows_for
 from scripts.setup_demo import build
 
@@ -17,12 +18,12 @@ ROWS = [Row("C1", "A change is routine", "Org", "plan: routine", "holds", False,
 def test_completion_step_line_is_dashed_red():
     svg = alignment_svg("Lesson", "Plan", ROWS, 2, 3, "foresight")
     line = re.search(r'<line class="completion"[^>]*>', svg).group(0)
-    assert 'stroke-dasharray' in line and "#B42318" in line
+    assert 'stroke-dasharray' in line and COLORS["tertiary-line"] in line
 
 
 def test_displayed_count_equals_k_of_n():
     svg = alignment_svg("Lesson", "Plan", ROWS, 2, 3, "foresight")
-    assert re.search(r'class="count"[^>]*>2 of 3<', svg)
+    assert re.search(r'class="count"[^>]*>2 OF 3<', svg)
 
 
 def test_text_is_escaped_and_accessible():
@@ -31,12 +32,20 @@ def test_text_is_escaped_and_accessible():
     assert "<title" in svg and "<desc" in svg
 
 
-def test_absence_is_marked_with_empty_set():
-    assert "∅" in alignment_svg("L", "P", ROWS, 2, 3, "foresight")
+def test_absence_is_marked_by_shape_not_colour():
+    svg = alignment_svg("L", "P", ROWS, 2, 3, "foresight")
+    assert "NOT RECORDED IN THE COMPANY GRAPH" in svg          # text, not colour alone
+    assert 'stroke-dasharray="5 4"' in svg                     # the dashed silence line
 
 
 def test_strip_has_one_mark_per_condition():
-    assert shape_strip([(True, False), (True, True), (False, False)], 2).count("<circle") == 3
+    assert shape_strip([(True, False), (True, True), (False, False)], 2).count("<rect") == 3
+
+
+def test_only_the_completion_step_is_vermilion():
+    svg = alignment_svg("Lesson", "Plan", ROWS, 2, 3, "foresight")
+    red_lines = re.findall(r'<line[^>]*' + COLORS["tertiary-line"], svg)
+    assert len(red_lines) == 1
 
 
 @pytest.fixture

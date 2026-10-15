@@ -1,9 +1,10 @@
+# Blueprint Ledger (DESIGN.md). Colours mirror nodus/theme.py.
 [theme]
 base = "light"
-primaryColor = "#2E7A68"
-backgroundColor = "#F2F4F0"
-secondaryBackgroundColor = "#E4E9E4"
-textColor = "#1E2B2F"
+primaryColor = "#23241F"
+backgroundColor = "#F1F0EA"
+secondaryBackgroundColor = "#E5E3DA"
+textColor = "#1B1C18"
 font = "sans serif"
 
 [server]

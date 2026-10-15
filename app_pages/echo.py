@@ -1,7 +1,7 @@
 """Echo: the past failure's shape beside the plan, condition by condition."""
 import streamlit as st
 
-from app_pages.common import level_html, setup
+from app_pages.common import level_html, setup, spec
 from nodus.agent import echo_id, echo_record
 from nodus.lessons import active_lessons, lesson_detail
 from nodus.matcher import evaluate
@@ -45,10 +45,18 @@ else:
     st.title(f"{result.k} of {result.n} conditions of “{les['name']}”")
     st.markdown(f"Level: {level_html(lvl)}", unsafe_allow_html=True)
 
+src_names = sorted({cit["publisher"] for cond in lesson_detail(g, lesson_id)
+                    for cit in cond["citations"] if cit.get("publisher")})
+spec([("Plan", plans[plan_id], False),
+      ("Lesson", f'{les["name"]} ({"public" if les["origin"] == "public" else "internal"})', False),
+      ("Match", f"{result.k} of {result.n} conditions", False),
+      ("Completion", completion_text + (" (not taken yet)" if lvl == "foresight" else ""),
+       lvl in ("foresight", "full")),
+      ("Sources", ", ".join(src_names) or "internal post-mortem", False)])
 st.markdown(alignment_svg(les["name"], plans[plan_id], rows, result.k, result.n, lvl),
             unsafe_allow_html=True)
-st.caption("Green ✓ holds in the plan. Violet ∅ is something not recorded in the company graph. "
-           "The dashed red ring is the completion step. Grey means not present.")
+st.caption("Filled square: holds in the plan. Square with a slash and a dashed line: not recorded "
+           "in the company graph (∅). Dashed red square: the completion step. Empty square: not present.")
 
 states = [(c.holds, spec["kind"] == "absent") for c, spec in zip(result.conditions, les["conditions"])]
 comp = [c["id"] for c in les["conditions"]].index(les["completion"])

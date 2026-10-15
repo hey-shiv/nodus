@@ -1,7 +1,7 @@
 """Plans: what NODUS is watching, and the owner's edits that make it react."""
 import streamlit as st
 
-from app_pages.common import level_html, open_echo, setup
+from app_pages.common import level_html, open_echo, setup, spec
 from nodus.agent import on_plan_saved
 from nodus.lessons import active_lessons
 from nodus.matcher import evaluate
@@ -41,11 +41,10 @@ st.write(f"NODUS checks every plan against {len(lessons)} approved lessons by st
          f"and what is connected, not which words are used. {len(at_risk)} plans need attention.")
 
 for pid, title, summary, risk, owner in sorted(plans, key=lambda p: (p[0] not in at_risk, p[1])):
-    st.markdown(f'<div class="ledger-row"><div class="ledger-title">{title}</div>'
-                f'<div class="ledger-meta">Owner: {owner or "none recorded"}, filed as {risk}'
-                f'</div></div>', unsafe_allow_html=True)
-    if summary:
-        st.caption(summary)
+    st.markdown(f'<div class="ledger-row"><div class="ledger-title">{title}</div></div>',
+                unsafe_allow_html=True)
+    spec([("Owner", owner or "none recorded", False), ("Filed as", risk, False),
+          ("Note", summary or "none", False)])
     for les in lessons:
         r, lvl = results[(pid, les["id"])]
         if lvl == "ignore":
@@ -55,7 +54,8 @@ for pid, title, summary, risk, owner in sorted(plans, key=lambda p: (p[0] not in
         origin = "public" if les["origin"] == "public" else "internal"
         cols = st.columns([6, 1.2], vertical_alignment="center")
         cols[0].markdown(f'<div class="echo-line"><span>{shape_strip(states, comp)}</span>'
-                         f'<span>{r.k} of {r.n}: “{les["name"]}” ({origin})</span>'
+                         f'<span><span class="kn">{r.k} OF {r.n}</span>&nbsp; “{les["name"]}” '
+                         f'<span class="label">{origin}</span></span>'
                          f'{level_html(lvl)}</div>', unsafe_allow_html=True)
         if is_warning(lvl) and cols[1].button("Open echo", key=f"open-{pid}-{les['id']}"):
             open_echo(pid, les["id"])

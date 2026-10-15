@@ -16,8 +16,12 @@ pages = st.navigation([
 ])
 
 with st.sidebar:
-    st.markdown("**NODUS**  \nLearn from mistakes you never made.")
-    st.caption("Demo company: Tern & Tally Freight (synthetic).")
+    st.markdown('<div class="brand">NODUS</div>', unsafe_allow_html=True)
+    st.markdown('<dl class="spec"><dt>Type</dt><dd>Immune memory for plans</dd>'
+                '<dt>Engine</dt><dd>FalkorDB graph patterns</dd>'
+                '<dt>Company</dt><dd>Tern &amp; Tally Freight (synthetic)</dd></dl>',
+                unsafe_allow_html=True)
+    st.caption("Learn from mistakes you never made.")
     with st.expander("Reset the demo"):
         approved = st.checkbox("Lessons already approved", value=True)
         if st.button("Reset demo world", type="secondary"):
