@@ -42,10 +42,13 @@ Requires Docker Desktop, Python 3.12 and [uv](https://docs.astral.sh/uv/) (or pi
 git clone https://github.com/hey-shiv/nodus && cd nodus
 docker compose up -d                                   # FalkorDB 6.0.2 on 127.0.0.1:6379
 python3.12 -m venv .venv
-uv pip install --python .venv/bin/python -r requirements.txt   # or: .venv/bin/pip install -r requirements.txt
+uv pip install --python .venv/bin/python -r requirements-local.txt   # or: .venv/bin/pip install -r requirements-local.txt
 .venv/bin/python scripts/setup_demo.py --approve       # load the synthetic world + 3 lessons
 .venv/bin/streamlit run app.py                         # http://localhost:8501
 ```
+
+The public website (Next.js + the same engine behind a small API) deploys to Vercel with a free
+FalkorDB Cloud database: see [docs/DEPLOY.md](docs/DEPLOY.md).
 
 In the app, use **Reset the demo** in the sidebar at any time. Then:
 1. **Plans:** the hero plan is "one step away" on three lessons, and the photo-archive plan on a fourth. Open **Compare with keyword search**.

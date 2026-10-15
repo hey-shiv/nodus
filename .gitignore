@@ -20,3 +20,4 @@ cache/
 
 # Local model / app artefacts
 .streamlit/secrets.toml
+.vercel/

@@ -1,0 +1,9 @@
+# Local-only folders; never uploaded to Vercel.
+.venv/
+cache/
+.env
+web/node_modules/
+web/.next/
+tests/
+eval/*-output.md
+docs/diary/.jots.md
