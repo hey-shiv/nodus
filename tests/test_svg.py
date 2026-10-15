@@ -39,7 +39,7 @@ def test_absence_is_marked_by_shape_not_colour():
 
 
 def test_strip_has_one_mark_per_condition():
-    assert shape_strip([(True, False), (True, True), (False, False)], 2).count("<rect") == 3
+    assert shape_strip([(True, False), (True, True), (False, False)], 2).count("<circle") == 3
 
 
 def test_only_the_completion_step_is_vermilion():

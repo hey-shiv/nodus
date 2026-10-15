@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+/* NODUS web: a mixture of bharatdigital.org (cream paper, Libertinus serif with caps and italics,
+   DM Mono olive labels, postage stamps, sage drawers) and sarvam.ai (soft periwinkle and orange
+   glow, centred calm hero, pill labels and buttons, clean white cards). */
+@theme {
+  --color-paper: #FFFBF2;
+  --color-paper-2: #FCF8EF;
+  --color-ink: #232323;
+  --color-muted: #5F5E57;
+  --color-olive: #606C47;
+  --color-sage: #B9C69E;
+  --color-sage-deep: #55623C;
+  --color-peri: #B6C4FD;
+  --color-peri-soft: #DCE4FF;
+  --color-peri-ink: #212191;
+  --color-terra: #D79B82;
+  --color-terra-ink: #9A3F1F;
+  --color-navy: #2A2C33;
+  --color-line: #E6E1D4;
+  --font-serif: var(--font-libertinus), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-libertinus-display), var(--font-libertinus), Georgia, serif;
+  --font-sans: var(--font-public-sans), -apple-system, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, Menlo, monospace;
+}
+
+html { background: var(--color-paper); }
+body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-sans);
+  font-size: 16px; line-height: 1.6; }
+::selection { background: var(--color-peri); color: var(--color-ink); }
+:focus-visible { outline: 2px solid var(--color-peri-ink); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* Headlines: Libertinus, UPPERCASE words mixed with italic lowercase (Bharat Digital) */
+.sheet-title, .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em;
+  line-height: 1.12; color: var(--color-ink); text-wrap: balance; }
+.display em, .sheet-title em, .section-title em { font-family: var(--font-serif); font-style: italic; }
+.section-title { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.2px; line-height: 1.18;
+  color: var(--color-ink); text-wrap: balance; }
+.label { font-family: var(--font-mono); font-size: 12.5px; font-weight: 500; letter-spacing: 1.75px;
+  text-transform: uppercase; color: var(--color-olive); }
+.prose-body { max-width: 62ch; line-height: 1.65; font-size: 1.05rem; color: var(--color-muted); }
+
+/* Sarvam: the soft glow behind the hero */
+.glow { background:
+  radial-gradient(60% 55% at 50% -8%, rgba(247, 158, 84, 0.55) 0%, rgba(247, 158, 84, 0) 60%),
+  radial-gradient(70% 70% at 50% 18%, #D5E2FF 0%, rgba(213, 226, 255, 0) 70%),
+  var(--color-paper); }
+
+/* Pills: Sarvam buttons and labels */
+.pill-label { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(33, 33, 145, 0.18);
+  background: rgba(255, 255, 255, 0.6); color: var(--color-peri-ink); border-radius: 999px; padding: 5px 14px;
+  font-size: 14px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px;
+  padding: 0 22px; border-radius: 999px; font-family: var(--font-sans); font-size: 15px; font-weight: 500;
+  border: 1px solid rgba(35, 35, 35, 0.12); background: #FFFFFF; color: var(--color-ink); cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out; }
+.btn > span + span { border: 0; padding: 0; }
+.btn:hover { background: #F5F2EA; }
+.btn-primary { background: var(--color-navy); color: #FFFFFF; border-color: var(--color-navy); }
+.btn-primary:hover { background: #17181D; }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* Sarvam: clean white cards */
+.card { background: #FFFFFF; border: 1px solid var(--color-line); border-radius: 18px; }
+.frame { background: #FFFFFF; border: 1px solid var(--color-line); border-radius: 18px; }
+.quote { background: var(--color-paper-2); border: 1px solid var(--color-line); border-radius: 14px;
+  padding: 0.9rem 1.1rem; }
+.dot { width: 8px; height: 8px; border-radius: 999px; background: var(--color-peri); display: inline-block; flex: none; }
+
+/* Facts list (spec): calm two-column list */
+.spec { display: grid; grid-template-columns: max-content 1fr; column-gap: 1.25rem; row-gap: 0.4rem; font-size: 0.95rem; }
+.spec dt { font-family: var(--font-mono); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--color-olive); padding-top: 3px; }
+.spec dd { margin: 0; color: var(--color-ink); }
+.spec dd.red { color: var(--color-terra-ink); font-weight: 600; }
+
+/* Levels and silences */
+.lvl { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 1.2px;
+  text-transform: uppercase; white-space: nowrap; border-radius: 999px; padding: 3px 10px; }
+.lvl-foresight, .lvl-full { background: #F6DED3; color: var(--color-terra-ink); }
+.lvl-strong { background: var(--color-peri-soft); color: var(--color-peri-ink); }
+.lvl-note, .lvl-ignore { background: #EFEBE0; color: var(--color-muted); }
+.silence { font-size: 0.95rem; color: var(--color-muted); padding-left: 0.9rem; border-left: 2px solid var(--color-peri); }
+.drawing svg { width: 100%; height: auto; display: block; }
+
+/* Bharat Digital: postage stamps (perforated edge) */
+.stamp { --c: var(--color-sage); position: relative; background: var(--c); padding: 14px;
+  /* perforated edge: a grid of holes, with a solid layer covering everything but the border */
+  -webkit-mask: radial-gradient(circle at center, #0000 4.2px, #000 4.8px) -7px -7px / 14px 14px round,
+                linear-gradient(#000 0 0) center / calc(100% - 14px) calc(100% - 14px) no-repeat;
+          mask: radial-gradient(circle at center, #0000 4.2px, #000 4.8px) -7px -7px / 14px 14px round,
+                linear-gradient(#000 0 0) center / calc(100% - 14px) calc(100% - 14px) no-repeat; }
+.stamp-inner { border: 1.5px solid rgba(35, 35, 35, 0.55); height: 100%; padding: 14px 14px 12px;
+  display: flex; flex-direction: column; gap: 6px; }
+
+/* Bharat Digital: sage drawers */
+.drawer { background: var(--color-sage); border: 1.5px solid #4E5A37; padding: 10px; }
+.drawer-face { border: 1.5px solid #4E5A37; height: 100%; padding: 18px 18px 22px; display: flex; flex-direction: column;
+  align-items: center; gap: 12px; text-align: center; }
+.drawer-tag { background: #FFFBF2; border: 1.5px solid #4E5A37; font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; }
+.knob { width: 14px; height: 14px; border-radius: 999px; background: #232323; }
+
+input[type="text"], select, textarea { border: 1px solid var(--color-line); border-radius: 12px; background: #FFFFFF;
+  padding: 0.6rem 0.85rem; font-family: var(--font-sans); font-size: 15px; }
+
+/* fonts inside the server-drawn SVGs (nodus/svg.py tags its text with these classes) */
+.drawing .t-sans { font-family: var(--font-sans); }
+.drawing .t-serif { font-family: var(--font-serif); }
+.drawing .t-mono { font-family: var(--font-mono); }

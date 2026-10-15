@@ -1,21 +1,24 @@
 """The alignment drawing: the past failure's shape (left) beside the plan (right).
 
 A pure function of display rows (nodus.view.rows_for), which come only from the match result.
-Drawn as a technical sheet (DESIGN.md "Blueprint Ledger"): graphite linework on paper, square
-markers, a dimension line for "k OF n", registration crosses, and vermilion ONLY for the
-completion step. State is carried by shape and line style, never by colour alone:
-  holds        solid graphite line, filled square
-  silence (∅)  dashed graphite line, outlined square with a slash
-  completion   long-dash vermilion line, dashed vermilion square with "?"
-  not present  faint dotted line, empty outlined square
+Drawn in DESIGN.md's "Paper and Post" style: ink on a white card, round markers, a measured
+"k OF n", and terracotta ONLY for the completion step. State is carried by shape and line
+style, never by colour alone:
+  holds        solid ink line, filled dot with a tick
+  silence (∅)  dashed ink line, outlined dot with a slash
+  completion   long-dash terracotta line, dashed terracotta ring with "?"
+  not present  faint dotted line, empty ring
 """
 from html import escape
 from textwrap import wrap
 
-from nodus.theme import COLORS, DISPLAY, MONO
+from nodus.theme import COLORS, MONO, SANS, SERIF
 
 INK, PENCIL, PAPER, RULE = COLORS["primary"], COLORS["secondary"], COLORS["surface"], COLORS["border"]
 RED, RED_INK = COLORS["tertiary-line"], COLORS["tertiary"]
+PERI = COLORS["peri"]
+# CSS classes let the website apply its own loaded fonts; the attributes are the fallback.
+_CLASS = {SANS: "t-sans", SERIF: "t-serif", MONO: "t-mono"}
 WIDTH, TOP, ROW_H = 840, 132, 86
 LEFT_X, COL_W = 64, 290
 RIGHT_X = WIDTH - 24 - COL_W
@@ -30,32 +33,29 @@ def _lines(text, width=34, max_lines=2):
     return out
 
 
-def _text(x, y, text, size=15, weight=400, fill=INK, anchor="start", font=DISPLAY, spacing=0,
+def _text(x, y, text, size=15, weight=400, fill=INK, anchor="start", font=SANS, spacing=0,
           width=34):
     tspans = "".join(f'<tspan x="{x}" dy="{0 if i == 0 else size + 4}">{escape(line)}</tspan>'
                      for i, line in enumerate(_lines(text, width)))
-    return (f'<text x="{x}" y="{y}" font-family="{font}" font-size="{size}" font-weight="{weight}" '
-            f'letter-spacing="{spacing}" fill="{fill}" text-anchor="{anchor}">{tspans}</text>')
+    return (f'<text class="{_CLASS.get(font, "t-sans")}" x="{x}" y="{y}" font-family="{font}" '
+            f'font-size="{size}" font-weight="{weight}" letter-spacing="{spacing}" fill="{fill}" '
+            f'text-anchor="{anchor}">{tspans}</text>')
 
 
-def _cross(x, y, size=7):
-    return (f'<path d="M{x - size} {y}H{x + size}M{x} {y - size}V{y + size}" stroke="{INK}" '
-            f'stroke-width="1"/>')
-
-
-def _marker(row, x, y, s=9):
-    box = f'x="{x - s}" y="{y - s}" width="{2 * s}" height="{2 * s}"'
+def _marker(row, x, y, r=10):
     if row.completion and row.state != "holds":
-        return (f'<rect {box} fill="{PAPER}" stroke="{RED}" stroke-width="2" stroke-dasharray="4 3"/>'
-                f'<text x="{x}" y="{y + 4.5}" font-family="{MONO}" font-size="12" font-weight="600" '
-                f'fill="{RED_INK}" text-anchor="middle">?</text>')
+        return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="{PAPER}" stroke="{RED}" stroke-width="2" '
+                f'stroke-dasharray="3.5 3"/>'
+                f'<text class="t-mono" x="{x}" y="{y + 4.5}" font-family="{MONO}" font-size="12" '
+                f'font-weight="500" fill="{RED_INK}" text-anchor="middle">?</text>')
     if row.state == "holds" and row.absence:
-        return (f'<rect {box} fill="{PAPER}" stroke="{INK}" stroke-width="1.5"/>'
-                f'<path d="M{x - s + 3} {y + s - 3}L{x + s - 3} {y - s + 3}" stroke="{INK}" '
-                f'stroke-width="1.5"/>')
+        return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="{PAPER}" stroke="{INK}" stroke-width="1.6"/>'
+                f'<path d="M{x - 6} {y + 6}L{x + 6} {y - 6}" stroke="{INK}" stroke-width="1.6"/>')
     if row.state == "holds":
-        return f'<rect {box} fill="{INK}"/>'
-    return f'<rect {box} fill="{PAPER}" stroke="{PENCIL}" stroke-width="1"/>'
+        return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="{INK}"/>'
+                f'<path d="M{x - 4.5} {y}L{x - 1} {y + 3.5}L{x + 5} {y - 3.5}" stroke="{PAPER}" '
+                f'stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>')
+    return f'<circle cx="{x}" cy="{y}" r="{r}" fill="{PAPER}" stroke="{PENCIL}" stroke-width="1"/>'
 
 
 def _connector(row, y):
@@ -90,16 +90,13 @@ def alignment_svg(lesson_name, plan_title, rows, k, n, level):
         f'<desc id="d">Each row pairs one condition of the past failure with what the plan '
         f'contains. {k} of {n} conditions hold; level: {escape(level)}.</desc>',
         f'<rect width="{WIDTH}" height="{height}" fill="{PAPER}"/>',
-        f'<rect x="8.5" y="8.5" width="{WIDTH - 17}" height="{height - 17}" fill="none" '
-        f'stroke="{RULE}"/>',
-        _cross(8.5, 8.5), _cross(WIDTH - 8.5, 8.5), _cross(8.5, height - 8.5),
-        _cross(WIDTH - 8.5, height - 8.5),
+
         _text(LEFT_X, 38, "THE PAST FAILURE", 11, 500, PENCIL, font=MONO, spacing=1.2),
-        _text(LEFT_X, 62, lesson_name, 17, 800, INK, width=30),
+        _text(LEFT_X, 64, lesson_name, 20, 400, INK, font=SERIF, width=30),
         _text(RIGHT_X, 38, "THIS PLAN", 11, 500, PENCIL, font=MONO, spacing=1.2),
-        _text(RIGHT_X, 62, plan_title, 17, 800, INK, width=30),
+        _text(RIGHT_X, 64, plan_title, 20, 400, INK, font=SERIF, width=30),
         _dimension(62, k, n),
-        f'<line x1="{LEFT_X}" y1="{TOP - 18}" x2="{WIDTH - 24}" y2="{TOP - 18}" stroke="{INK}" '
+        f'<line x1="{LEFT_X}" y1="{TOP - 18}" x2="{WIDTH - 24}" y2="{TOP - 18}" stroke="{RULE}" '
         f'stroke-width="1"/>',
     ]
     for i, row in enumerate(rows):
@@ -108,7 +105,7 @@ def alignment_svg(lesson_name, plan_title, rows, k, n, level):
         parts.append(f'<g class="row {escape(row.state)}"><title>{escape(row.cid)}: '
                      f'{escape(row.lesson_text)} | plan: {escape(row.plan_text)}</title>')
         parts.append(_text(24, y, row.cid, 11, 500, RED_INK if red else PENCIL, font=MONO))
-        parts.append(_text(LEFT_X, y, row.lesson_text, 15, 700 if red else 400,
+        parts.append(_text(LEFT_X, y, row.lesson_text, 15, 600 if red else 400,
                            RED_INK if red else INK))
         parts.append(_text(LEFT_X, y + 42, row.source.upper(), 10, 500, PENCIL, font=MONO,
                            spacing=0.8, width=46))
@@ -129,25 +126,26 @@ def alignment_svg(lesson_name, plan_title, rows, k, n, level):
     return "".join(parts)
 
 
-def shape_strip(states, completion_index, size=13, gap=5):
-    """The k-of-n strip used in lists: one square per condition, completion last."""
+def shape_strip(states, completion_index, size=14, gap=5):
+    """The k-of-n strip used in lists: one dot per condition, completion last."""
     order = [i for i in range(len(states)) if i != completion_index] + [completion_index]
     w = len(states) * (size + gap)
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{size + 2}" '
            f'viewBox="0 0 {w} {size + 2}" aria-hidden="true">']
+    r = size / 2
     for slot, i in enumerate(order):
         holds, absence = states[i]
-        x, y = slot * (size + gap) + 1, 1
-        box = f'x="{x}" y="{y}" width="{size}" height="{size}"'
+        cx, cy = slot * (size + gap) + r + 1, r + 1
         if i == completion_index and not holds:
-            out.append(f'<rect {box} fill="none" stroke="{RED}" stroke-width="2" stroke-dasharray="3 2"/>')
+            out.append(f'<circle cx="{cx}" cy="{cy}" r="{r - 1}" fill="none" stroke="{RED}" '
+                       f'stroke-width="2" stroke-dasharray="3 2"/>')
         elif holds and absence:
-            out.append(f'<rect {box} fill="none" stroke="{INK}" stroke-width="1.5"/>'
-                       f'<path d="M{x + 2} {y + size - 2}L{x + size - 2} {y + 2}" stroke="{INK}" '
+            out.append(f'<circle cx="{cx}" cy="{cy}" r="{r - 1}" fill="none" stroke="{INK}" stroke-width="1.5"/>'
+                       f'<path d="M{cx - r + 3} {cy + r - 3}L{cx + r - 3} {cy - r + 3}" stroke="{INK}" '
                        f'stroke-width="1.5"/>')
         elif holds:
-            out.append(f'<rect {box} fill="{INK}"/>')
+            out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{INK}"/>')
         else:
-            out.append(f'<rect {box} fill="none" stroke="{PENCIL}" stroke-width="1"/>')
+            out.append(f'<circle cx="{cx}" cy="{cy}" r="{r - 1}" fill="none" stroke="{PENCIL}" stroke-width="1"/>')
     out.append("</svg>")
     return "".join(out)

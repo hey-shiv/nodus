@@ -1,0 +1,170 @@
+[
+ {
+  "plan": "plan-billing",
+  "lesson": "antibody-1",
+  "k": 1,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-billing",
+  "lesson": "antibody-2",
+  "k": 2,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-billing",
+  "lesson": "antibody-3",
+  "k": 2,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-billing",
+  "lesson": "internal-quiet-push",
+  "k": 2,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-hero",
+  "lesson": "antibody-1",
+  "k": 4,
+  "n": 5,
+  "status": "foresight"
+ },
+ {
+  "plan": "plan-hero",
+  "lesson": "antibody-2",
+  "k": 3,
+  "n": 4,
+  "status": "foresight"
+ },
+ {
+  "plan": "plan-hero",
+  "lesson": "antibody-3",
+  "k": 1,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-hero",
+  "lesson": "internal-quiet-push",
+  "k": 4,
+  "n": 5,
+  "status": "foresight"
+ },
+ {
+  "plan": "plan-maps",
+  "lesson": "antibody-1",
+  "k": 3,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-maps",
+  "lesson": "antibody-2",
+  "k": 4,
+  "n": 4,
+  "status": "full"
+ },
+ {
+  "plan": "plan-maps",
+  "lesson": "antibody-3",
+  "k": 2,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-maps",
+  "lesson": "internal-quiet-push",
+  "k": 5,
+  "n": 5,
+  "status": "full"
+ },
+ {
+  "plan": "plan-photos",
+  "lesson": "antibody-1",
+  "k": 1,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-photos",
+  "lesson": "antibody-2",
+  "k": 1,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-photos",
+  "lesson": "antibody-3",
+  "k": 3,
+  "n": 4,
+  "status": "foresight"
+ },
+ {
+  "plan": "plan-photos",
+  "lesson": "internal-quiet-push",
+  "k": 2,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-scanner",
+  "lesson": "antibody-1",
+  "k": 3,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-scanner",
+  "lesson": "antibody-2",
+  "k": 1,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-scanner",
+  "lesson": "antibody-3",
+  "k": 1,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-scanner",
+  "lesson": "internal-quiet-push",
+  "k": 3,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-sensor",
+  "lesson": "antibody-1",
+  "k": 2,
+  "n": 5,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-sensor",
+  "lesson": "antibody-2",
+  "k": 2,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-sensor",
+  "lesson": "antibody-3",
+  "k": 2,
+  "n": 4,
+  "status": "partial"
+ },
+ {
+  "plan": "plan-sensor",
+  "lesson": "internal-quiet-push",
+  "k": 3,
+  "n": 5,
+  "status": "partial"
+ }
+]
