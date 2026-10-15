@@ -27,13 +27,18 @@ def _plan_title(graph, plan_id):
     return rows[0][0] if rows else plan_id
 
 
-def on_plan_saved(graph, plan_id, now=None):
+def on_plan_saved(graph, plan_id, now=None, trace=None):
+    """trace: optional observer with .condition(lesson, cond, bindings, result) and
+    .decision(lesson, result, level), used to stream the run (nodus/agui.py)."""
     now = now or int(time.time())
     title = _plan_title(graph, plan_id)
     report = []
     for lesson in active_lessons(graph):                                   # OBSERVE
-        result = evaluate(graph, plan_id, lesson)                         # MATCH (read-only)
+        observe = (lambda c, b, r, les=lesson: trace.condition(les, c, b, r)) if trace else None
+        result = evaluate(graph, plan_id, lesson, observe)               # MATCH (read-only)
         lvl = level(result.k, result.n, result.missing, lesson["completion"])   # DECIDE
+        if trace:
+            trace.decision(lesson, result, lvl)
         eid = echo_id(lesson["id"], plan_id)
         if not is_warning(lvl):
             _clear(graph, eid, now)

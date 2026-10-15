@@ -41,31 +41,37 @@ def _roles_needed(cond):
     return roles
 
 
-def _run(graph, conditions, anchor, bindings):
-    """Evaluate conditions in order; branch when a binder finds several candidates."""
+def _run(graph, conditions, anchor, bindings, on_condition=None):
+    """Evaluate conditions in order; branch when a binder finds several candidates.
+
+    on_condition(cond, bindings, result): optional observer, called after each query runs
+    (used to stream the run as AG-UI events). It never changes the result.
+    """
     if not conditions:
         return [], bindings
     cond, rest = conditions[0], conditions[1:]
 
     if any(role not in bindings for role in _roles_needed(cond)):
         result = ConditionResult(cond["id"], False, "unbound")
-        later, final = _run(graph, rest, anchor, bindings)
+        later, final = _run(graph, rest, anchor, bindings, on_condition)
         return [result] + later, final
 
     cypher, params = compile_condition(cond, anchor, bindings)
     rows = graph.ro_query(cypher, params).result_set
     holds, ids = rows[0] if rows else (False, [])   # no rows: the start node doesn't exist
     result = ConditionResult(cond["id"], bool(holds), "holds" if holds else "missing", ids)
+    if on_condition:
+        on_condition(cond, dict(bindings), result)
 
     role = cond.get("bind")
     if not (role and holds):
-        later, final = _run(graph, rest, anchor, bindings)
+        later, final = _run(graph, rest, anchor, bindings, on_condition)
         return [result] + later, final
 
     # One branch per candidate (ids are sorted); keep the highest k, ties -> smallest id.
     best = None
     for candidate in ids:
-        later, final = _run(graph, rest, anchor, {**bindings, role: candidate})
+        later, final = _run(graph, rest, anchor, {**bindings, role: candidate}, on_condition)
         k = sum(c.holds for c in later)
         if best is None or k > best[0]:
             best = (k, later, final)
@@ -80,14 +86,14 @@ def _status(k, n, missing, completion):
     return "partial"
 
 
-def evaluate(graph, anchor, lesson):
+def evaluate(graph, anchor, lesson, on_condition=None):
     # Some conditions are facts about the company, not the plan (A1.2), so they would
     # hold even for a plan that doesn't exist. Check the anchor first.
     found = read(graph, "MATCH (p:Plan) WHERE p.id = $anchor RETURN count(p)",
                  {"anchor": anchor})
     found = found[0][0] if found else 0
     if found:
-        conditions, bindings = _run(graph, lesson["conditions"], anchor, {})
+        conditions, bindings = _run(graph, lesson["conditions"], anchor, {}, on_condition)
     else:
         conditions = [ConditionResult(c["id"], False, "unbound") for c in lesson["conditions"]]
         bindings = {}

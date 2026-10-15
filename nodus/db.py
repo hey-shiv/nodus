@@ -4,10 +4,16 @@ import os
 from falkordb import FalkorDB
 
 
+def get_db():
+    """A connection from the environment. FalkorDB Cloud adds a username and password."""
+    return FalkorDB(host=os.environ.get("NODUS_DB_HOST", "localhost"),
+                    port=int(os.environ.get("NODUS_DB_PORT", "6379")),
+                    username=os.environ.get("NODUS_DB_USERNAME") or None,
+                    password=os.environ.get("NODUS_DB_PASSWORD") or None)
+
+
 def get_graph(name=None):
-    db = FalkorDB(host=os.environ.get("NODUS_DB_HOST", "localhost"),
-                  port=int(os.environ.get("NODUS_DB_PORT", "6379")))
-    return db.select_graph(name or os.environ.get("NODUS_GRAPH", "nodus"))
+    return get_db().select_graph(name or os.environ.get("NODUS_GRAPH", "nodus"))
 
 
 def read(graph, query, params=None):
