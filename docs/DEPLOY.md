@@ -84,3 +84,7 @@ from scratch.
   wakes the API.
 - **Sandboxes expire.** Old visitor graphs are removed automatically (`sandbox.cleanup`), so a
   tab left open for hours shows "start a new one".
+- **Recorded run when the database is down.** If `/api/health` fails, the demo replays real
+  responses from `web/public/replay` (every plan setup one save away) and says so at the top.
+  Re-record after changing the demo world: `docker compose up -d`, then
+  `.venv/bin/python -m scripts.record_replay`.
