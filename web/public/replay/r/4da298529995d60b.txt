@@ -1,0 +1,166 @@
+data: {"type":"RUN_STARTED","threadId":"plan-plan-scanner","runId":"recorded"}
+
+data: {"type":"STEP_STARTED","stepName":"observe"}
+
+data: {"type":"STATE_SNAPSHOT","snapshot":{"plan":{"id":"plan-scanner","title":"Scanner handheld OS patch","risk_class":"routine","steps":[],"gates":[{"id":"chk-human","kind":"human"},{"id":"chk-schema","kind":"automated"}],"follows":[]},"echoes":{}}}
+
+data: {"type":"STEP_FINISHED","stepName":"observe"}
+
+data: {"type":"STEP_STARTED","stepName":"match"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-1","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-1","delta":"{\"lesson\": \"antibody-1\", \"condition\": \"A1.1\", \"kind\": \"attribute_equals\", \"anchor\": \"plan-scanner\", \"bindings\": {}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-1"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-1","toolCallId":"call-1","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"plan-scanner\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-2","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-2","delta":"{\"lesson\": \"antibody-1\", \"condition\": \"A1.2\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-2"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-2","toolCallId":"call-2","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"proc-canary\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-3","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-3","delta":"{\"lesson\": \"antibody-1\", \"condition\": \"A1.3\", \"kind\": \"absent\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-3"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-3","toolCallId":"call-3","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"plan-scanner\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-4","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-4","delta":"{\"lesson\": \"antibody-1\", \"condition\": \"A1.4\", \"kind\": \"count_equals\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-4"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-4","toolCallId":"call-4","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": [\"chk-human\", \"chk-schema\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-5","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-5","delta":"{\"lesson\": \"antibody-1\", \"condition\": \"A1.5\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-5"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-5","toolCallId":"call-5","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": []}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-6","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-6","delta":"{\"lesson\": \"antibody-2\", \"condition\": \"A2.1\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-6"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-6","toolCallId":"call-6","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"ch-ops-chat\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-7","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-7","delta":"{\"lesson\": \"antibody-2\", \"condition\": \"A2.2\", \"kind\": \"attribute_equals\", \"anchor\": \"plan-scanner\", \"bindings\": {\"ch\": \"ch-ops-chat\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-7"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-7","toolCallId":"call-7","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": [\"ch-ops-chat\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-8","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-8","delta":"{\"lesson\": \"antibody-2\", \"condition\": \"A2.3\", \"kind\": \"absent\", \"anchor\": \"plan-scanner\", \"bindings\": {\"ch\": \"ch-ops-chat\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-8"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-8","toolCallId":"call-8","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": [\"ch-ops-chat\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-9","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-9","delta":"{\"lesson\": \"antibody-2\", \"condition\": \"A2.4\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {\"ch\": \"ch-ops-chat\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-9"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-9","toolCallId":"call-9","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": []}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-10","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-10","delta":"{\"lesson\": \"antibody-3\", \"condition\": \"A3.1\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-10"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-10","toolCallId":"call-10","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"sys-scanner\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-11","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-11","delta":"{\"lesson\": \"antibody-3\", \"condition\": \"A3.2\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {\"sys\": \"sys-scanner\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-11"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-11","toolCallId":"call-11","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": []}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-12","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-12","delta":"{\"lesson\": \"antibody-3\", \"condition\": \"A3.4\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {\"sys\": \"sys-scanner\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-12"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-12","toolCallId":"call-12","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": []}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-13","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-13","delta":"{\"lesson\": \"internal-quiet-push\", \"condition\": \"Q.1\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-13"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-13","toolCallId":"call-13","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"proc-canary\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-14","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-14","delta":"{\"lesson\": \"internal-quiet-push\", \"condition\": \"Q.2\", \"kind\": \"absent\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-14"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-14","toolCallId":"call-14","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"plan-scanner\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-15","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-15","delta":"{\"lesson\": \"internal-quiet-push\", \"condition\": \"Q.3\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-15"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-15","toolCallId":"call-15","content":"{\"holds\": true, \"state\": \"holds\", \"ids\": [\"ch-ops-chat\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-16","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-16","delta":"{\"lesson\": \"internal-quiet-push\", \"condition\": \"Q.4\", \"kind\": \"absent\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\", \"ch\": \"ch-ops-chat\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-16"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-16","toolCallId":"call-16","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": [\"ch-ops-chat\"]}"}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"call-17","toolCallName":"check_condition"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"call-17","delta":"{\"lesson\": \"internal-quiet-push\", \"condition\": \"Q.5\", \"kind\": \"present\", \"anchor\": \"plan-scanner\", \"bindings\": {\"proc\": \"proc-canary\", \"ch\": \"ch-ops-chat\"}}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"call-17"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"result-17","toolCallId":"call-17","content":"{\"holds\": false, \"state\": \"missing\", \"ids\": []}"}
+
+data: {"type":"STEP_FINISHED","stepName":"match"}
+
+data: {"type":"STEP_STARTED","stepName":"decide"}
+
+data: {"type":"STATE_DELTA","delta":[{"op":"add","path":"/echoes/antibody-1","value":{}},{"op":"add","path":"/echoes/antibody-1/k","value":3},{"op":"add","path":"/echoes/antibody-1/n","value":5},{"op":"add","path":"/echoes/antibody-1/level","value":"note"},{"op":"add","path":"/echoes/antibody-1/missing","value":["A1.4","A1.5"]},{"op":"add","path":"/echoes/antibody-2","value":{}},{"op":"add","path":"/echoes/antibody-2/k","value":1},{"op":"add","path":"/echoes/antibody-2/n","value":4},{"op":"add","path":"/echoes/antibody-2/level","value":"ignore"},{"op":"add","path":"/echoes/antibody-2/missing","value":["A2.2","A2.3","A2.4"]},{"op":"add","path":"/echoes/antibody-3","value":{}},{"op":"add","path":"/echoes/antibody-3/k","value":1},{"op":"add","path":"/echoes/antibody-3/n","value":4},{"op":"add","path":"/echoes/antibody-3/level","value":"ignore"},{"op":"add","path":"/echoes/antibody-3/missing","value":["A3.2","A3.3","A3.4"]},{"op":"add","path":"/echoes/internal-quiet-push","value":{}},{"op":"add","path":"/echoes/internal-quiet-push/k","value":3},{"op":"add","path":"/echoes/internal-quiet-push/n","value":5},{"op":"add","path":"/echoes/internal-quiet-push/level","value":"note"},{"op":"add","path":"/echoes/internal-quiet-push/missing","value":["Q.4","Q.5"]}]}
+
+data: {"type":"STEP_FINISHED","stepName":"decide"}
+
+data: {"type":"STEP_STARTED","stepName":"act"}
+
+data: {"type":"STEP_FINISHED","stepName":"act"}
+
+data: {"type":"STEP_STARTED","stepName":"remember"}
+
+data: {"type":"STATE_DELTA","delta":[]}
+
+data: {"type":"STEP_FINISHED","stepName":"remember"}
+
+data: {"type":"RUN_FINISHED","threadId":"plan-plan-scanner","runId":"recorded"}
+

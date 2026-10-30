@@ -1,0 +1,1 @@
+{"steps":[{"id":"plan-photos-s1","kind":"test","scope":"subset"},{"id":"plan-photos-u2","kind":"review","scope":"all"}],"follows_canary":false,"peer_review":true}

@@ -1,0 +1,1 @@
+{"steps":[{"id":"plan-sensor-s2","kind":"rollout","scope":"all"},{"id":"plan-sensor-u2","kind":"test","scope":"subset"}],"follows_canary":false,"peer_review":false}

@@ -2,7 +2,7 @@
 // Runs the NODUS agent on a plan and shows its AG-UI event stream as it arrives
 // (github.com/ag-ui-protocol/ag-ui). Each graph query is a TOOL_CALL with its result.
 import { useState } from "react";
-import { sandboxId } from "@/lib/api";
+import { agentStream } from "@/lib/api";
 
 type Ev = { type: string; [k: string]: unknown };
 type Line = { kind: "step" | "call" | "state" | "text" | "run" | "error"; text: string; detail?: string };
@@ -40,12 +40,7 @@ export default function AgentTrace({ planId }: { planId: string }) {
     setRunning(true); setLines([]); setCount(0);
     const args = new Map<string, string>();
     try {
-      const r = await fetch("/api/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Nodus-Sandbox": await sandboxId(), Accept: "text/event-stream" },
-        body: JSON.stringify({ threadId: `plan-${planId}`, runId: crypto.randomUUID().slice(0, 12),
-          state: { plan_id: planId }, messages: [], tools: [], context: [], forwardedProps: {} }),
-      });
+      const r = await agentStream(planId);
       if (!r.ok || !r.body) throw new Error(`The agent could not start (${r.status}).`);
       const reader = r.body.getReader();
       const decoder = new TextDecoder();

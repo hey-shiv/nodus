@@ -1,0 +1,1 @@
+{"steps":[{"id":"plan-maps-s1","kind":"test","scope":"subset"},{"id":"plan-maps-s2","kind":"rollout","scope":"all"},{"id":"plan-maps-u3","kind":"canary","scope":"subset"}],"follows_canary":true,"peer_review":false}

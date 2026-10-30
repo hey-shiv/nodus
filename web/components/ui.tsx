@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Level } from "@/lib/api";
 import { LEVEL_WORDS } from "@/lib/api";
+import ReplayNotice from "./ReplayNotice";
 
 export function Spec({ rows }: { rows: [string, React.ReactNode, boolean?][] }) {
   return (
@@ -48,6 +49,7 @@ export function DemoNav({ active }: { active: string }) {
         ))}
       </nav>
       <span className="pill-label">Your own copy of a made-up company</span>
+      <div className="basis-full"><ReplayNotice /></div>
     </div>
   );
 }

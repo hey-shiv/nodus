@@ -26,6 +26,7 @@ export default function PlansClient() {
   const [form, setForm] = useState({ follows: false, review: false, kind: "", scope: "subset", remove: [] as string[] });
   const [saving, setSaving] = useState(false);
   const [raised, setRaised] = useState<Raised[] | null>(null);
+  const [saveError, setSaveError] = useState("");
 
   const load = useCallback(async () => {
     try { setData(await api<Overview>("/api/plans")); setError(""); }
@@ -61,7 +62,7 @@ export default function PlansClient() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    setSaving(true);
+    setSaving(true); setSaveError("");
     try {
       const r = await api<{ raised: Raised[] }>(`/api/plans/${planId}`, {
         method: "POST",
@@ -70,7 +71,7 @@ export default function PlansClient() {
       });
       setRaised(r.raised);
       await Promise.all([load(), loadDetail(planId)]);
-    } catch (err) { setError((err as Error).message); }
+    } catch (err) { setRaised(null); setSaveError((err as Error).message); }
     finally { setSaving(false); }
   }
 
@@ -127,7 +128,7 @@ export default function PlansClient() {
           <div className="flex flex-col gap-4">
             <label className="flex flex-col gap-2">
               <span className="label">Plan</span>
-              <select value={planId} onChange={(e) => { setPlanId(e.target.value); setRaised(null); }}>
+              <select value={planId} onChange={(e) => { setPlanId(e.target.value); setRaised(null); setSaveError(""); }}>
                 {data.plans.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
               </select>
             </label>
@@ -180,11 +181,12 @@ export default function PlansClient() {
           </div>
           <div className="flex flex-wrap items-center gap-4 md:col-span-2">
             <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save plan"}</button>
-            <button type="button" className="btn" onClick={async () => { await resetSandbox(); setRaised(null); await load(); await loadDetail(planId); }}>
+            <button type="button" className="btn" onClick={async () => { await resetSandbox(); setRaised(null); setSaveError(""); await load(); await loadDetail(planId); }}>
               Start over with a fresh copy
             </button>
           </div>
         </form>
+        {saveError && <p role="alert" className="quote mt-6 text-terra-ink">Not saved: {saveError}</p>}
         {raised && (
           <div role="status" className="quote mt-6">
             <p className="label mb-1">Saved “{plan?.title}”</p>

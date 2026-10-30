@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ErrorNote, LevelTag, Loading, Spec, Svg } from "@/components/ui";
-import { api, sandboxId, type Level } from "@/lib/api";
+import { api, melodyUrl, type Level } from "@/lib/api";
 
 type Citation = { doc: string; title: string; url: string | null; origin: string; quote: string; publisher: string };
 type Echo = {
@@ -23,13 +23,14 @@ export default function EchoClient() {
   const key = `${plan}|${lesson}`;
   const [loaded, setLoaded] = useState<{ key: string; echo: Echo } | null>(null);
   const [plans, setPlans] = useState<Overview["plans"]>([]);
-  const [sbx, setSbx] = useState("");
+  const [audio, setAudio] = useState<(string | null)[]>([null, null]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([api<Echo>(`/api/echo?plan=${plan}&lesson=${lesson}`), api<Overview>("/api/plans"), sandboxId()])
-      .then(([e, o, s]) => { if (!cancelled) { setLoaded({ key: `${plan}|${lesson}`, echo: e }); setPlans(o.plans); setSbx(s); } })
+    Promise.all([api<Echo>(`/api/echo?plan=${plan}&lesson=${lesson}`), api<Overview>("/api/plans"),
+      melodyUrl(plan, lesson, false), melodyUrl(plan, lesson, true)])
+      .then(([e, o, a, b]) => { if (!cancelled) { setLoaded({ key: `${plan}|${lesson}`, echo: e }); setPlans(o.plans); setAudio([a, b]); } })
       .catch((e) => { if (!cancelled) setError((e as Error).message); });
     return () => { cancelled = true; };
   }, [plan, lesson]);
@@ -41,7 +42,6 @@ export default function EchoClient() {
   const title = data.level === "foresight" ? `One step from “${data.lesson.name}”`
     : data.level === "full" ? `The whole shape of “${data.lesson.name}”`
     : `${data.k} of ${data.n} conditions of “${data.lesson.name}”`;
-  const melody = (resolve: boolean) => `/api/melody?plan=${plan}&lesson=${lesson}&resolve=${resolve}&sbx=${sbx}`;
 
   return (
     <div className="mx-auto max-w-[1240px] px-5 pt-8">
@@ -87,12 +87,12 @@ export default function EchoClient() {
         <div className="flex flex-col gap-2">
           <span className="label">What the plan already has</span>
           <p className="text-sm">One note per condition that holds, a short silence for each ∅, the completion note held back.</p>
-          <audio controls preload="none" src={melody(false)} />
+          {audio[0] ? <audio controls preload="none" src={audio[0]} /> : <p className="label">Not in the recorded run.</p>}
         </div>
         <div className="flex flex-col gap-2">
           <span className="label">{data.completion_missing ? "Resolved: the step not to take" : "Already resolved"}</span>
           <p className="text-sm">{data.completion_missing ? "The same phrase if the plan took the completion step." : "The completion step is already in the plan."}</p>
-          {data.completion_missing && <audio controls preload="none" src={melody(true)} />}
+          {data.completion_missing && audio[1] && <audio controls preload="none" src={audio[1]} />}
         </div>
       </section>
 

@@ -1,0 +1,1 @@
+{"steps":[{"id":"plan-scanner-s1","kind":"test","scope":"subset"},{"id":"plan-scanner-u2","kind":"canary","scope":"all"}],"follows_canary":false,"peer_review":false}
